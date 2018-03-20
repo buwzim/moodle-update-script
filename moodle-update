@@ -377,13 +377,6 @@ printf "%-25s %s" "purge cache" ": "
         checkstatus
 
 
-# start cron job
-printf "%-25s %s" "run cronjob" ": "
-
-        $PHP_PATH $MOODLE_PATH_LINK/admin/cli/cron.php
-        checkstatus
-
-
 printf "%s \n" " "
 printf "%s \n" " "
 printf "%s \n" "All jobs done."
