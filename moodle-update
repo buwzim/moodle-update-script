@@ -37,7 +37,7 @@ FOLDER[10]="anmeldung"
 
 # language files
 LANG_LICENSE_EN="/var/www/moodle/lang/en/license.php"
-LANG_LICENSE_DE="/opt/moodle/daten/lang/de/license.php"
+LANG_LICENSE_DE="/opt/moodle_nfs/daten/lang/de/license.php"
 
 
 # start
