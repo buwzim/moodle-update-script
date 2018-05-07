@@ -34,6 +34,7 @@ FOLDER[7]="question/format"
 FOLDER[8]="portfolio"
 FOLDER[9]="lib/editor/atto/plugins"
 FOLDER[10]="anmeldung"
+FOLDER[11]="blocks"
 
 # language files
 LANG_LICENSE_EN="/var/www/moodle/lang/en/license.php"
