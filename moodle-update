@@ -2,12 +2,16 @@
 
 # moodle update script
 
-#=======================================#
-#    Bergische Universität Wuppertal    #
-#                                       #
-#    Author:                            #
-#          Sebastian Sennewald          #
-#=======================================#
+#=======================================================#
+#    Bergische Universität Wuppertal                    #
+#                                                       #
+#    Author:                                            #
+#       Sebastian Sennewald                             #
+#                                                       #
+#    Source:                                            #
+#       https://github.com/buwzim/moodle-update-script  #
+#                                                       #
+#=======================================================#
 
 # functions
 function checkstatus() {
