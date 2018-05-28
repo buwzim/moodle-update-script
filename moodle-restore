@@ -1,0 +1,126 @@
+#!/bin/bash
+
+# moodle restore script
+
+#=======================================================#
+#    Bergische Universität Wuppertal                    #
+#                                                       #
+#    Author:                                            #
+#       Sebastian Sennewald                             #
+#                                                       #
+#    Source:                                            #
+#       https://github.com/buwzim/moodle-update-script  #
+#                                                       #
+#=======================================================#
+
+# settings
+WEB_PATH="/var/www"
+MOODLE_LINK_NAME="moodle"
+CONTINUE="rtfm"
+
+        # get current moodle version
+        if test -h $WEB_PATH/$MOODLE_LINK_NAME
+        then
+                LINK_CURRENT_TARGET=$(readlink "$WEB_PATH/$MOODLE_LINK_NAME")
+                MOODLE_VERSION_NOW=${LINK_CURRENT_TARGET//$WEB_PATH\/moodle_}
+        fi
+
+MOODLE_PATH_LINK="$WEB_PATH/$MOODLE_LINK_NAME"
+MOODLE_PATH_REAL="$LINK_CURRENT_TARGET"
+
+
+# functions
+function checkstatus() {
+
+        if test $? -ne 0
+        then
+                printf "%s \n" "FAILED" 1>&2
+                exit 5
+        else
+                printf "%s \n" "OK"
+        fi
+}
+
+
+# start
+tput clear
+
+printf "%s \n" " "
+printf "%s \n" " "
+printf "%s \n" "+-------------------------------+"
+printf "%s \n" "+     moodle restore script     +"
+printf "%s \n" "+-------------------------------+"
+printf "%s \n" " "
+
+
+# check if paramter is given
+if test -z $1
+then
+        printf "%s \n" "ERROR: Please use the folder name you want to restore as paramter." 1>&2
+        printf "%s \n" " "
+        exit 1
+fi
+
+
+# check if parameter starts with: moodle_
+echo "$1" | grep "^moodle_[0-9]*\.[0-9]*_" > /dev/null
+
+if test $? -eq 0
+then
+        # get restore moodle version
+        MOODLE_VERSION_RESTORE=$(echo "$1" | grep -o "[0-9]*\.[0-9]*")
+else
+        printf "%s \n" "ERROR: Invalid folder name." 1>&2
+        printf "%s \n" " "
+        exit 2
+fi
+
+
+# check for same version
+if test "$MOODLE_VERSION_RESTORE" != "$MOODLE_VERSION_NOW"
+then
+        printf "%s \n" "ERROR: Different version numbers." 1>&2
+        printf "%s \n" " "
+        exit 3
+fi
+
+
+printf "%s \n" "All pre-checks successfull."
+printf "%s \n" " "
+
+# ask user to continue
+until test $CONTINUE = "y" -o $CONTINUE = "n"
+do
+        printf "%s \n" "Continue? (y/n)"
+        read -r CONTINUE
+done
+
+        if test $CONTINUE = "n"
+        then
+                printf "%s \n" " "
+                printf "%s \n" "goodbye."
+                printf "%s \n" " "
+                exit 4
+        fi
+
+        # user wants to continue
+        printf "%s \n" " "
+
+
+# delete current moodle folder
+printf "%-25s %s" "delete current moodle" ": "
+
+        rm -r $MOODLE_PATH_REAL
+        checkstatus
+
+
+# copy backup
+printf "%-25s %s" "restore backup" ": "
+
+        cp -r $1/ $MOODLE_PATH_REAL/
+        checkstatus
+
+
+# All done
+printf "%s \n" "done."
+printf "%s \n" " "
