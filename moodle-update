@@ -69,6 +69,7 @@ fi
 CONTINUE="rtfm"
 WEB_PATH="/var/www"
 PHP_PATH="/usr/bin/php"
+CURL_PATH="/usr/bin/curl"
 MOODLE_LINK_NAME="moodle"
 
 # build url version parameter
@@ -141,6 +142,38 @@ printf "%-25s %s" "php" ": "
         else
                 printf "%s \n" "OK"
         fi
+
+
+# check if cURL is available
+printf "%-25s %s" "cURL" ": "
+
+        if test ! -e $CURL_PATH
+        then
+                printf "%s \n" "FAILED" 1>&2
+                exit 5
+        else
+                printf "%s \n" "OK"
+        fi
+
+
+# check if a new version is available
+printf "%-25s %s" "script version" ": "
+
+        # download version file
+        curl https://raw.githubusercontent.com/buwzim/moodle-update-script/master/version --output remoteversion
+
+        # save version numbers into var
+        SCRIPT_VERSION_REMOTE=$(cat remoteversion)
+        SCRIPT_VERSION_LOCAL=$(cat version)
+
+        if test $SCRIPT_VERSION_LOCAL -eq $SCRIPT_VERSION_REMOTE
+        then
+                printf "%s \n" "OK"
+        else
+                printf "%s %s %d %s %d %s \n" "WARNING" "(local: " $SCRIPT_VERSION_LOCAL " | remote: " $SCRIPT_VERSION_REMOTE ")" 1>&2
+        fi
+
+        rm remoteversion
 
 
 # check current moodle path
