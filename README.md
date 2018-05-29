@@ -9,4 +9,9 @@ To automate __our environment__ we wrote this shell script. It may wont work in 
 At the top of the script you have to check the list of folders which shall be used in the new moodle version. It's the __FOLDER[]__-Array. Modify it to your needs.
 
 ## Usage
-You can run the script with a moodle version paramter: __./update-moodle 3.5__ or without it.
+* You can run the script with or without a moodle version paramter: __./update-moodle 3.5__
+* If a newer version is available, the script will inform you about it.
+
+## Restore
+* To restore a backup use: _moodle-restore foldername_
+* It has to be the same version (x.y) as in use.
