@@ -25,26 +25,6 @@ function checkstatus() {
         fi
 }
 
-# list of plugin directories
-# standard plugins
-FOLDER[0]="theme"
-FOLDER[1]="mod"
-FOLDER[2]="report"
-FOLDER[3]="auth"
-FOLDER[4]="filter"
-FOLDER[5]="local"
-FOLDER[6]="repository"
-FOLDER[7]="question/format"
-FOLDER[8]="portfolio"
-FOLDER[9]="lib/editor/atto/plugins"
-FOLDER[10]="anmeldung"
-FOLDER[11]="blocks"
-
-# language files
-LANG_LICENSE_EN="/var/www/moodle/lang/en/license.php"
-LANG_LICENSE_DE="/opt/moodle_nfs/daten/lang/de/license.php"
-
-
 # start
 tput clear
 
@@ -65,26 +45,76 @@ else
 fi
 
 
+# list of plugin directories
+FOLDER[0]="theme"
+FOLDER[1]="mod"
+FOLDER[2]="report"
+FOLDER[3]="auth"
+FOLDER[4]="filter"
+FOLDER[5]="local"
+FOLDER[6]="repository"
+FOLDER[7]="question/format"
+FOLDER[8]="portfolio"
+FOLDER[9]="lib/editor/atto/plugins"
+FOLDER[10]="anmeldung"
+FOLDER[11]="blocks"
+
 # settings
 CONTINUE="rtfm"
 WEB_PATH="/var/www"
 PHP_PATH="/usr/bin/php"
 CURL_PATH="/usr/bin/curl"
 MOODLE_LINK_NAME="moodle"
+MOODLE_PATH="$WEB_PATH/$MOODLE_LINK_NAME"
+MOODLE_CONFIG="$MOODLE_PATH/config.php"
+
+
+# check moodle config file
+printf "%-25s %s" "moodle config" ": "
+
+        if test ! -e $MOODLE_CONFIG
+        then
+                printf "%s \n" "FAILED" 1>&2
+                exit 1
+        else
+                printf "%s \n" "OK"
+
+                
+                echo "$1" | grep "^moodle_[0-9]*\.[0-9]*_" > /dev/null
+        fi
+
+
+# get moodle data path
+TEMP1=$(grep "^\$CFG->dataroot" $MOODLE_PATH/config.php | cut -d" " -f4)
+TEMP2=${TEMP1//\'}
+MOODLE_DATA_PATH=${TEMP2//\;}
+
+# check moodle data path
+printf "%-25s %s" "moodle data folder" ": "
+
+        if test ! -d $MOODLE_DATA_PATH
+        then
+                printf "%s \n" "FAILED" 1>&2
+                exit 1
+        else
+                printf "%s \n" "OK"
+        fi
+
+
+# language files
+LANG_LICENSE_EN="$MOODLE_PATH/lang/en/license.php"
+LANG_LICENSE_DE="$MOODLE_DATA_PATH/lang/de/license.php"
 
 # build url version parameter
 MOODLE_VERSION_NEXT_URL=${MOODLE_VERSION_NEXT//.}
 
 # get current moodle version
-if test -h $WEB_PATH/$MOODLE_LINK_NAME
+if test -h $MOODLE_PATH
 then
-        LINK_CURRENT_TARGET=$(readlink "$WEB_PATH/$MOODLE_LINK_NAME")
+        LINK_CURRENT_TARGET=$(readlink "$MOODLE_PATH")
+        MOODLE_PATH_REAL="$LINK_CURRENT_TARGET"
         MOODLE_VERSION_NOW=${LINK_CURRENT_TARGET//$WEB_PATH\/moodle_}
 fi
-
-
-MOODLE_PATH_LINK="$WEB_PATH/$MOODLE_LINK_NAME"
-MOODLE_PATH_REAL="$LINK_CURRENT_TARGET"
 
 MOODLE_DOWNLOAD_FILE="moodle-latest-${MOODLE_VERSION_NEXT_URL}.zip"
 MOODLE_DOWNLOAD_URL="https://download.moodle.org/download.php/direct/stable${MOODLE_VERSION_NEXT_URL}/$MOODLE_DOWNLOAD_FILE"
@@ -337,14 +367,14 @@ done
 # update sym link
 printf "%-25s %s" "update symlink" ": "
 
-        rm $MOODLE_PATH_LINK && ln -s $MOODLE_NEXT_PATH $MOODLE_PATH_LINK
+        rm $MOODLE_PATH && ln -s $MOODLE_NEXT_PATH $MOODLE_PATH
         checkstatus
 
 
 # set rights
 printf "%-25s %s" "update rights" ": "
 
-        chown -R www-data:www-data $MOODLE_NEXT_PATH && chown -R www-data:www-data $MOODLE_PATH_LINK
+        chown -R www-data:www-data $MOODLE_NEXT_PATH && chown -R www-data:www-data $MOODLE_PATH
         checkstatus
 
 
@@ -352,7 +382,7 @@ printf "%-25s %s" "update rights" ": "
 printf "%s \n" " "
 printf "%-25s \n" "update moodle ..."
 
-        $PHP_PATH $MOODLE_PATH_LINK/admin/cli/upgrade.php --non-interactive
+        $PHP_PATH $MOODLE_PATH/admin/cli/upgrade.php --non-interactive
 
         if test $? -ne 0
         then
@@ -404,14 +434,14 @@ printf "%-25s %s" "language strings (de)" ": "
 # moodle -> maintenance mode -> disable
 printf "%-25s %s" "disable maintenance" ": "
 
-        $PHP_PATH $MOODLE_PATH_LINK/admin/cli/maintenance.php --disable > /dev/null
+        $PHP_PATH $MOODLE_PATH/admin/cli/maintenance.php --disable > /dev/null
         checkstatus
 
 
 # delete cache
 printf "%-25s %s" "purge cache" ": "
 
-        $PHP_PATH $MOODLE_PATH_LINK/admin/cli/purge_caches.php
+        $PHP_PATH $MOODLE_PATH/admin/cli/purge_caches.php
         checkstatus
 
 
