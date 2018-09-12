@@ -372,13 +372,6 @@ printf "%-25s %s" "update symlink" ": "
         checkstatus
 
 
-# set rights
-printf "%-25s %s" "update rights" ": "
-
-        chown -R "$WEBUSER:$WEBUSER" $MOODLE_NEXT_PATH && chown -R "$WEBUSER:$WEBUSER" $MOODLE_PATH
-        checkstatus
-
-
 # update moodle
 printf "%s \n" " "
 printf "%-25s \n" "update moodle ..."
@@ -394,7 +387,6 @@ printf "%-25s \n" "update moodle ..."
                 printf "%s \n" " "
                 printf "%-25s %s \n" "upgrade moodle" ": OK"
         fi
-
 
 
 # modify license lang strings
@@ -430,6 +422,13 @@ printf "%-25s %s" "language strings (de)" ": "
         else
                 printf "%s \n" "OK"
         fi
+
+
+# set rights
+printf "%-25s %s" "update permissions" ": "
+
+        chown -R "$WEBUSER:$WEBUSER" $MOODLE_NEXT_PATH && chown -R "$WEBUSER:$WEBUSER" $MOODLE_PATH
+        checkstatus
 
 
 # moodle -> maintenance mode -> disable
