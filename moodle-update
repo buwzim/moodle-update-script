@@ -61,6 +61,7 @@ FOLDER[11]="blocks"
 
 # settings
 CONTINUE="rtfm"
+WEBUSER="www-data"
 WEB_PATH="/var/www"
 PHP_PATH="/usr/bin/php"
 CURL_PATH="/usr/bin/curl"
@@ -79,7 +80,7 @@ printf "%-25s %s" "moodle config" ": "
         else
                 printf "%s \n" "OK"
 
-                
+
                 echo "$1" | grep "^moodle_[0-9]*\.[0-9]*_" > /dev/null
         fi
 
@@ -374,7 +375,7 @@ printf "%-25s %s" "update symlink" ": "
 # set rights
 printf "%-25s %s" "update rights" ": "
 
-        chown -R www-data:www-data $MOODLE_NEXT_PATH && chown -R www-data:www-data $MOODLE_PATH
+        chown -R "$WEBUSER:$WEBUSER" $MOODLE_NEXT_PATH && chown -R "$WEBUSER:$WEBUSER" $MOODLE_PATH
         checkstatus
 
 
