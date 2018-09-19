@@ -18,10 +18,24 @@ function checkstatus() {
 
         if test $? -ne 0
         then
-                printf "%s \n" "FAILED" 1>&2
-                exit 5
+                # ask user to continue
+                until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
+                do
+                        printf "%s" "FAILED > Continue? (y/n)" 1>&2
+                        read -r CONTINUE
+                done
+
+                        if test "$CONTINUE" = "n"
+                        then
+                                printf "%s \n" " "
+                                printf "%s \n" "process cancelled"
+                                printf "%s \n" " "
+                                exit 66
+                        fi
+
         else
                 printf "%s \n" "OK"
+                CONTINUE="rtfm"
         fi
 }
 
