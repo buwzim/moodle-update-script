@@ -136,8 +136,16 @@ then
         MOODLE_VERSION_NOW=${LINK_CURRENT_TARGET//$WEB_PATH\/moodle_}
 fi
 
-MOODLE_DOWNLOAD_FILE="moodle-latest-${MOODLE_VERSION_NEXT_URL}.zip"
-MOODLE_DOWNLOAD_URL="https://download.moodle.org/download.php/direct/stable${MOODLE_VERSION_NEXT_URL}/$MOODLE_DOWNLOAD_FILE"
+# check if url parameter is given
+if test $2
+then
+        MOODLE_DOWNLOAD_URL=$2
+        MOODLE_DOWNLOAD_FILE=${MOODLE_DOWNLOAD_URL##*/}
+else
+        MOODLE_DOWNLOAD_FILE="moodle-latest-${MOODLE_VERSION_NEXT_URL}.zip"
+        MOODLE_DOWNLOAD_URL="https://download.moodle.org/download.php/direct/stable${MOODLE_VERSION_NEXT_URL}/$MOODLE_DOWNLOAD_FILE"
+fi
+
 
 MOODLE_TEMP="moodle_temp"
 MOODLE_TEMP_PATH="$WEB_PATH/$MOODLE_TEMP"
@@ -156,6 +164,34 @@ printf "%s \n" " "
 printf "%-25s %s \n" "target version" ": $MOODLE_VERSION_NEXT"
 printf "%-25s %s \n" "current version" ": $MOODLE_VERSION_NOW"
 printf "%s \n" " "
+
+
+# show download url
+printf "%-25s %s %s \n" "download url" ":" "$MOODLE_DOWNLOAD_URL"
+
+
+# download latest moodle
+printf "%-25s %s" "download moodle" ": "
+
+        wget -q $MOODLE_DOWNLOAD_URL
+        checkstatus
+
+
+# file size
+printf "%-25s %s" "file size (MB)" ": "
+
+        FILESIZE=$(cat $MOODLE_DOWNLOAD_FILE | wc -c)
+        FILESIZE=$(( FILESIZE / 1024 / 1024 ))
+
+        printf "%d" "$FILESIZE"
+
+        if test $FILESIZE -eq 0
+        then
+                printf "%s \n" " FAILED" 1>&2
+                exit 65
+        else
+                printf "\n"
+        fi
 
 
 # check web path: folder
@@ -313,13 +349,6 @@ printf "%-25s %s" "moodle backup" ": "
 printf "%-25s %s" "delete old moodle" ": "
 
         rm -r "$MOODLE_PATH_REAL"
-        checkstatus
-
-
-# download latest moodle
-printf "%-25s %s" "download latest version" ": "
-
-        wget -q $MOODLE_DOWNLOAD_URL
         checkstatus
 
 
