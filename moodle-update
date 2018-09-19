@@ -257,20 +257,30 @@ printf "%-25s %s" "enable maintenance" ": "
 
 
 # time to wait in maintenance mode until work continues
-printf "%s" "minutes to wait: "
+printf "%-25s %s" "minutes to wait" ": "
 
         read -r WAIT_FOR_MAINTENANCE
 
                 until test $WAIT_FOR_MAINTENANCE -ge 0
                 do
                         printf "%s \n" " "
-                        printf "%s" "minutes to wait: "
+                        printf "%-25s %s" "minutes to wait" ": "
 
                         read -r WAIT_FOR_MAINTENANCE
                 done
 
         sleep ${WAIT_FOR_MAINTENANCE}m
         printf "%-25s %s \n" "waited $WAIT_FOR_MAINTENANCE minutes" ": OK"
+
+
+# stay in maintenance mode?
+until test "$STAY_IN_MAINTENANCE" = "y" -o "$STAY_IN_MAINTENANCE" = "n"
+do
+        printf "%-25s %s" "stay in maintenance (y/n)" ": "
+        read -r STAY_IN_MAINTENANCE
+done
+
+printf "\n"
 
 
 # create backup
@@ -432,10 +442,15 @@ printf "%-25s %s" "update permissions" ": "
 
 
 # moodle -> maintenance mode -> disable
-printf "%-25s %s" "disable maintenance" ": "
+if test "$STAY_IN_MAINTENANCE" = "n"
+then
+        printf "%-25s %s" "disable maintenance" ": "
 
         $PHP_PATH $MOODLE_PATH/admin/cli/maintenance.php --disable > /dev/null
         checkstatus
+else
+        printf "%-25s %s \n" "stay in maintenance" ": OK"
+fi
 
 
 # delete cache
