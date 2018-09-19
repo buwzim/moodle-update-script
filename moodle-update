@@ -16,6 +16,9 @@
 # functions
 function checkstatus() {
 
+        # set to default
+        CONTINUE="rtfm"
+
         if test $? -ne 0
         then
                 # ask user to continue
@@ -35,8 +38,10 @@ function checkstatus() {
 
         else
                 printf "%s \n" "OK"
-                CONTINUE="rtfm"
         fi
+
+        # set to default
+        CONTINUE="rtfm"
 }
 
 # start
@@ -248,7 +253,7 @@ printf "%s \n" "all pre-checks successfull"
         until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
         do
                 printf "%s" "continue? (y/n): "
-                read -r CONTINUE
+                read -n 1 CONTINUE
         done
 
                 if test "$CONTINUE" = "n"
@@ -291,7 +296,7 @@ printf "%-25s %s" "minutes to wait" ": "
 until test "$STAY_IN_MAINTENANCE" = "y" -o "$STAY_IN_MAINTENANCE" = "n"
 do
         printf "%-25s %s" "stay in maintenance (y/n)" ": "
-        read -r STAY_IN_MAINTENANCE
+        read -n 1 STAY_IN_MAINTENANCE
 done
 
 printf "\n"
@@ -370,19 +375,33 @@ do
                 # check if current list item is MISSING inside the new mooddle folder
                 if test ! -d $MOODLE_NEXT_PATH/$PLUGINDIR/$PLUGIN
                 then
-                        # if current list item is a folder, copy it
+                        # if current list item is a folder
                         if test -d $BACKUP_PATH/$PLUGINDIR/$PLUGIN
                         then
-                                printf "%-35s %s" "$PLUGINDIR/$PLUGIN" ": "
+                                # copy folder if wanted
+                                until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
+                                do
+                                        printf "%-46s %s" "Copy $PLUGINDIR/$PLUGIN? (y/n)" ": "
+                                        read -n 1 -s CONTINUE
+                                done
 
+                                # copy yes
+                                if test "$CONTINUE" = "y"
+                                then
                                         # create parent folder if missing
                                         if test ! -d $MOODLE_NEXT_PATH/$PLUGINDIR
                                         then
                                                 mkdir $MOODLE_NEXT_PATH/$PLUGINDIR
                                         fi
 
-                                cp -r $BACKUP_PATH/$PLUGINDIR/$PLUGIN/ $MOODLE_NEXT_PATH/$PLUGINDIR/$PLUGIN/
-                                checkstatus
+                                        cp -r $BACKUP_PATH/$PLUGINDIR/$PLUGIN/ $MOODLE_NEXT_PATH/$PLUGINDIR/$PLUGIN/
+                                        checkstatus
+                                else
+                                        printf "%s \n" "SKIPPED"
+                                fi
+
+                                # set to default
+                                CONTINUE="rtfm"
                         fi
                 fi
         done
@@ -390,14 +409,14 @@ done
 
 
 # update sym link
-printf "%-25s %s" "update symlink" ": "
+printf "%s \n" " "
+printf "%-46s %s" "update symlink" ": "
 
         rm $MOODLE_PATH && ln -s $MOODLE_NEXT_PATH $MOODLE_PATH
         checkstatus
 
 
 # update moodle
-printf "%s \n" " "
 printf "%-25s \n" "update moodle ..."
 
         $PHP_PATH $MOODLE_PATH/admin/cli/upgrade.php --non-interactive
