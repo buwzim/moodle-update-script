@@ -77,6 +77,7 @@ FOLDER[8]="portfolio"
 FOLDER[9]="lib/editor/atto/plugins"
 FOLDER[10]="anmeldung"
 FOLDER[11]="blocks"
+FOLDER[12]="mod/assign/submission"
 
 # settings
 CONTINUE="rtfm"
@@ -307,7 +308,7 @@ printf "%s \n" " "
 # moodle -> maintenance mode -> enable
 printf "%-25s %s" "enable maintenance" ": "
 
-        $PHP_PATH $MOODLE_PATH_REAL/admin/cli/maintenance.php --enable > /dev/null
+        $PHP_PATH $MOODLE_PATH_REAL/admin/cli/maintenance.php --enableold > /dev/null
         checkstatus
 
 
