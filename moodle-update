@@ -80,6 +80,7 @@ FOLDER[11]="blocks"
 FOLDER[12]="mod/assign/submission"
 FOLDER[13]="question/type"
 FOLDER[14]="grade/report"
+FOLDER[15]="course/format"
 
 # settings
 CONTINUE="rtfm"
