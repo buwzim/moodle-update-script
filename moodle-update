@@ -399,6 +399,16 @@ printf "%-25s %s" "copy: config.php" ": "
 
 # copy plugins
 printf "%s \n" " "
+
+        # choose copy mode
+        until test "$COPYALL" = "y" -o "$COPYALL" = "n"
+        do
+                printf "%s" "copy ALL plugins? (y/n): "
+                read -n 1 COPYALL
+        done
+
+
+printf "%s \n" " "
 printf "%s \n" "begin to copy plugins ..."
 
 # make a list of all plugin categories
@@ -413,6 +423,13 @@ do
                         # if current list item is a folder
                         if test -d $BACKUP_PATH/$PLUGINDIR/$PLUGIN
                         then
+
+                                # pre-define user input if copy mode is set to ALL
+                                if test "$COPYALL" = "y"
+                                then
+                                        CONTINUE="y"
+                                fi
+
                                 # copy folder if wanted
                                 until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
                                 do
