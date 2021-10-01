@@ -14,6 +14,19 @@
 #                                                       #
 #=======================================================#
 
+
+# No Colour
+NC='\033[0m'
+
+# Colour Codes
+WHITE='\033[1;37m'
+LIGHTGREEN='\033[1;32m'
+ORANGE='\033[0;33m'
+LIGHTRED='\033[1;31m'
+LIGHTPURPLE='\033[1;35m'
+LIGHTCYAN='\033[1;36m'
+
+
 # functions
 function checkstatus() {
 
@@ -25,20 +38,20 @@ function checkstatus() {
                 # ask user to continue
                 until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
                 do
-                        printf "%s" "FAILED > Continue? (y/n)" 1>&2
+                        printf "${LIGHTRED}%s${NC} ${ORANGE}%s${NC}" "FAILED > Continue?" "(y/n)" 1>&2
                         read -r CONTINUE
                 done
 
                         if test "$CONTINUE" = "n"
                         then
-                                printf "%s \n" " "
+                                printf "\n"
                                 printf "%s \n" "process cancelled"
-                                printf "%s \n" " "
+                                printf "\n"
                                 exit 66
                         fi
 
         else
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
 
         # set to default
@@ -48,12 +61,12 @@ function checkstatus() {
 # start
 tput clear
 
-printf "%s \n" " "
-printf "%s \n" " "
-printf "%s \n" "+------------------------------+"
-printf "%s \n" "+     moodle update script     +"
-printf "%s \n" "+------------------------------+"
-
+printf "\n"
+printf "\n"
+printf "${WHITE}%s${NC}\n" "+------------------------------+"
+printf "${WHITE}%s${NC}\n" "+     moodle update script     +"
+printf "${WHITE}%s${NC}\n" "+------------------------------+"
+printf "\n"
 
 # check if version parameter is given
 if test -z $1
@@ -101,10 +114,10 @@ printf "%-25s %s" "moodle config" ": "
 
         if test ! -e $MOODLE_CONFIG
         then
-                printf "%s \n" "FAILED" 1>&2
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 1
         else
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
 
 
                 echo "$1" | grep "^moodle_[0-9]*\.[0-9]*_" > /dev/null
@@ -121,10 +134,10 @@ printf "%-25s %s" "moodle data folder" ": "
 
         if test ! -d $MOODLE_DATA_PATH
         then
-                printf "%s \n" "FAILED" 1>&2
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 1
         else
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
 
 
@@ -167,14 +180,14 @@ BACKUP_PATH="$WEB_PATH/$BACKUP_NAME"
 
 
 # ask if versions are corret
-printf "%s \n" " "
-printf "%-25s %s \n" "target version" ": $MOODLE_VERSION_NEXT"
-printf "%-25s %s \n" "current version" ": $MOODLE_VERSION_NOW"
-printf "%s \n" " "
+printf "\n"
+printf "%-25s ${LIGHTCYAN}%s${NC} \n" "target version" ": $MOODLE_VERSION_NEXT"
+printf "%-25s ${LIGHTCYAN}%s${NC} \n" "current version" ": $MOODLE_VERSION_NOW"
+printf "\n"
 
 
 # show download url
-printf "%-25s %s %s \n" "download url" ":" "$MOODLE_DOWNLOAD_URL"
+printf "%-25s %s ${LIGHTPURPLE}%s${NC} \n" "download url" ":" "$MOODLE_DOWNLOAD_URL"
 
 
 # download latest moodle
@@ -190,11 +203,11 @@ printf "%-25s %s" "file size (MB)" ": "
         FILESIZE=$(cat $MOODLE_DOWNLOAD_FILE | wc -c)
         FILESIZE=$(( FILESIZE / 1024 / 1024 ))
 
-        printf "%d" "$FILESIZE"
+        printf "${LIGHTCYAN}%d${NC}" "$FILESIZE"
 
         if test $FILESIZE -eq 0
         then
-                printf "%s \n" " FAILED" 1>&2
+                printf "${LIGHTRED}%s${NC} \n" " FAILED" 1>&2
                 exit 65
         else
                 printf "\n"
@@ -206,10 +219,10 @@ printf "%-25s %s" "web path (folder)" ": "
 
         if test ! -d $WEB_PATH
         then
-                printf "%s \n" "FAILED" 1>&2
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 1
         else
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
 
 
@@ -218,10 +231,10 @@ printf "%-25s %s" "web path (access)" ": "
 
         if test ! -e $WEB_PATH
         then
-                printf "%s \n" "FAILED" 1>&2
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 2
         else
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
 
 
@@ -233,7 +246,7 @@ printf "%-25s %s" "php" ": "
                 printf "%s \n" "FAILED"  1>&2
                 exit 3
         else
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
 
 
@@ -242,10 +255,10 @@ printf "%-25s %s" "cURL" ": "
 
         if test ! -e $CURL_PATH
         then
-                printf "%s \n" "FAILED" 1>&2
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 5
         else
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
 
 
@@ -254,10 +267,10 @@ printf "%-25s %s" "moodle path" ": "
 
         if test ! -d $MOODLE_PATH_REAL
         then
-                printf "%s \n" "FAILED" 1>&2
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 4
         else
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
 
 
@@ -269,26 +282,26 @@ printf "%-25s %s" "go to web folder" ": "
 
 
 # all pre-checks done
-printf "%s \n" " "
+printf "\n"
 printf "%s \n" "all pre-checks successfull"
 
         # ask user to continue
         until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
         do
-                printf "%s" "continue? (y/n): "
+                printf "${ORANGE}%-25s${NC} %s" "continue? (y/n)" ": "
                 read -n 1 CONTINUE
         done
 
                 if test "$CONTINUE" = "n"
                 then
-                        printf "%s \n" " "
+                        printf "\n"
                         printf "%s \n" "goodbye."
-                        printf "%s \n" " "
+                        printf "\n"
                         exit 1
                 fi
 
 # user wants to continue
-printf "%s \n" " "
+printf "\n"
 
 
 # moodle -> maintenance mode -> enable
@@ -299,26 +312,28 @@ printf "%-25s %s" "enable maintenance" ": "
 
 
 # time to wait in maintenance mode until work continues
-printf "%-25s %s" "minutes to wait" ": "
+printf "${ORANGE}%-25s${NC} %s" "minutes to wait" ": "
 
         read -r WAIT_FOR_MAINTENANCE
 
                 until test $WAIT_FOR_MAINTENANCE -ge 0
                 do
-                        printf "%s \n" " "
-                        printf "%-25s %s" "minutes to wait" ": "
+                        printf "\n"
+                        printf "${ORANGE}%-25s${NC} %s" "minutes to wait" ": "
 
                         read -r WAIT_FOR_MAINTENANCE
                 done
 
+        printf "%-25s %s" "waiting ..." ": "
         sleep ${WAIT_FOR_MAINTENANCE}m
-        printf "%-25s %s \n" "waited $WAIT_FOR_MAINTENANCE minutes" ": OK"
+
+        printf "${LIGHTGREEN}%s${NC}\n" "OK"
 
 
 # stay in maintenance mode?
 until test "$STAY_IN_MAINTENANCE" = "y" -o "$STAY_IN_MAINTENANCE" = "n"
 do
-        printf "%-25s %s" "stay in maintenance (y/n)" ": "
+        printf "${ORANGE}%-25s${NC} %s" "stay in maintenance (y/n)" ": "
         read -n 1 STAY_IN_MAINTENANCE
 done
 
@@ -373,23 +388,23 @@ printf "%-25s %s" "copy: config.php" ": "
                 cp $BACKUP_PATH/config.php $MOODLE_NEXT_PATH/config.php
                 checkstatus
         else
-                printf "%s \n" "file missing" 1>&2
+                printf "${LIGHTRED}%s${NC} \n" "file missing" 1>&2
                 exit 11
         fi
 
 
 # copy plugins
-printf "%s \n" " "
+printf "\n"
 
         # choose copy mode
         until test "$COPYALL" = "y" -o "$COPYALL" = "n"
         do
-                printf "%s" "copy ALL plugins? (y/n): "
+                printf "${ORANGE}%-25s${NC}" "copy ALL plugins? (y/n): "
                 read -n 1 COPYALL
         done
 
 
-printf "%s \n" " "
+printf "\n"
 printf "%s \n" "begin to copy plugins ..."
 
 # make a list of all plugin categories
@@ -428,6 +443,12 @@ do
                                         fi
 
                                         cp -r $BACKUP_PATH/$PLUGINDIR/$PLUGIN/ $MOODLE_NEXT_PATH/$PLUGINDIR/$PLUGIN/
+
+                                                if test "$COPYALL" = "y"
+                                                then
+                                                        printf "%-46s %s" "Copy $PLUGINDIR/$PLUGIN" ": "
+                                                fi
+
                                         checkstatus
                                 else
                                         printf "%s \n" "SKIPPED"
@@ -442,7 +463,7 @@ done
 
 
 # update sym link
-printf "%s \n" " "
+printf "\n"
 printf "%-46s %s" "update symlink" ": "
 
         rm $MOODLE_PATH && ln -s $MOODLE_NEXT_PATH $MOODLE_PATH
@@ -456,12 +477,12 @@ printf "%-25s \n" "update moodle ..."
 
         if test $? -ne 0
         then
-                printf "%s \n" " "
-                printf "%-25s %s \n" "upgrade moodle" ": failed" 1>&2
+                printf "\n"
+                printf "%-25s %s ${LIGHTRED}%s${NC}\n" "upgrade moodle" ":" " FAILED" 1>&2
                 exit 12
         else
-                printf "%s \n" " "
-                printf "%-25s %s \n" "upgrade moodle" ": OK"
+                printf "\n"
+                printf "%-25s %s ${LIGHTGREEN}%s${NC}\n" "upgrade moodle" ":" "OK"
         fi
 
 
@@ -477,9 +498,9 @@ printf "%-25s %s" "language strings (en)" ": "
                 echo "\$string['gemeinfrei'] = 'Gemeinfrei';" >> $LANG_LICENSE_EN
                 echo "\$string['ungeprueft'] = 'Ungeprüft';" >> $LANG_LICENSE_EN
 
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         else
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
 
 
@@ -494,9 +515,9 @@ printf "%-25s %s" "language strings (de)" ": "
                 echo "\$string['gemeinfrei'] = 'Gemeinfrei';" >> $LANG_LICENSE_DE
                 echo "\$string['ungeprueft'] = 'Ungeprüft';" >> $LANG_LICENSE_DE
 
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         else
-                printf "%s \n" "OK"
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
 
 
@@ -515,7 +536,7 @@ then
         $PHP_PATH $MOODLE_PATH/admin/cli/maintenance.php --disable > /dev/null
         checkstatus
 else
-        printf "%-25s %s \n" "stay in maintenance" ": OK"
+        printf "%-25s %s ${LIGHTGREEN}%s${NC}\n" "stay in maintenance" ":" "OK"
 fi
 
 
@@ -526,7 +547,7 @@ printf "%-25s %s" "purge cache" ": "
         checkstatus
 
 
-printf "%s \n" " "
-printf "%s \n" " "
-printf "%s \n" "All jobs done."
-printf "%s \n" " "
+printf "\n"
+printf "\n"
+printf "${LIGHTGREEN}%s${NC}\n" "All jobs done."
+printf "\n"
