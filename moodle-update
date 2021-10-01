@@ -1,15 +1,16 @@
 #!/bin/bash
 
-# moodle update script
-
 #=======================================================#
-#    Bergische Universität Wuppertal                    #
+#   Bergische Universität Wuppertal                     #
 #                                                       #
-#    Author:                                            #
-#       Sebastian Sennewald                             #
+#   Author:                                             #
+#      Sebastian Sennewald                              #
 #                                                       #
-#    Source:                                            #
-#       https://github.com/buwzim/moodle-update-script  #
+#   Source:                                             #
+#      https://github.com/buwzim/moodle-update-script   #
+#                                                       #
+#   License:                                            #
+#      GPLv3, see LICENSE file                          #
 #                                                       #
 #=======================================================#
 
@@ -17,7 +18,7 @@
 function checkstatus() {
 
         # set to default
-        CONTINUE="rtfm"
+        CONTINUE="null"
 
         if test $? -ne 0
         then
@@ -41,7 +42,7 @@ function checkstatus() {
         fi
 
         # set to default
-        CONTINUE="rtfm"
+        CONTINUE="null"
 }
 
 # start
@@ -85,7 +86,7 @@ FOLDER[16]="availability"
 FOLDER[17]="question/behaviour"
 
 # settings
-CONTINUE="rtfm"
+CONTINUE="null"
 WEBUSER="www-data"
 WEB_PATH="/var/www"
 PHP_PATH="/usr/bin/php"
@@ -453,7 +454,7 @@ do
                                 fi
 
                                 # set to default
-                                CONTINUE="rtfm"
+                                CONTINUE="null"
                         fi
                 fi
         done
