@@ -249,26 +249,6 @@ printf "%-25s %s" "cURL" ": "
         fi
 
 
-# check if a new version is available
-printf "%-25s %s" "script version" ": "
-
-        # download version file
-        curl -s https://raw.githubusercontent.com/buwzim/moodle-update-script/master/version --output remoteversion
-
-        # save version numbers into var
-        SCRIPT_VERSION_REMOTE=$(cat remoteversion)
-        SCRIPT_VERSION_LOCAL=$(cat version)
-
-        if test $SCRIPT_VERSION_LOCAL -eq $SCRIPT_VERSION_REMOTE
-        then
-                printf "%s \n" "OK"
-        else
-                printf "%s %s %d %s %d %s \n" "WARNING" "(local: " $SCRIPT_VERSION_LOCAL " | remote: " $SCRIPT_VERSION_REMOTE ")" 1>&2
-        fi
-
-        rm remoteversion
-
-
 # check current moodle path
 printf "%-25s %s" "moodle path" ": "
 
