@@ -1,0 +1,22 @@
+# Do not delete this line
+PLUGINS_LOADED="TRUE"
+
+# Paths of installed plugins
+FOLDER[0]="theme"
+FOLDER[1]="mod"
+FOLDER[2]="report"
+FOLDER[3]="auth"
+FOLDER[4]="filter"
+FOLDER[5]="local"
+FOLDER[6]="repository"
+FOLDER[7]="question/format"
+FOLDER[8]="portfolio"
+FOLDER[9]="lib/editor/atto/plugins"
+FOLDER[10]="anmeldung"
+FOLDER[11]="blocks"
+FOLDER[12]="mod/assign/submission"
+FOLDER[13]="question/type"
+FOLDER[14]="grade/report"
+FOLDER[15]="course/format"
+FOLDER[16]="availability"
+FOLDER[17]="question/behaviour"

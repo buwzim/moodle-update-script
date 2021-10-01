@@ -68,6 +68,10 @@ printf "${WHITE}%s${NC}\n" "+     moodle update script     +"
 printf "${WHITE}%s${NC}\n" "+------------------------------+"
 printf "\n"
 
+# get script path
+SCRIPT_PATH=$(dirname "$(realpath $0)")
+
+
 # check if version parameter is given
 if test -z $1
 then
@@ -78,32 +82,50 @@ else
 fi
 
 
-# list of plugin directories
-FOLDER[0]="theme"
-FOLDER[1]="mod"
-FOLDER[2]="report"
-FOLDER[3]="auth"
-FOLDER[4]="filter"
-FOLDER[5]="local"
-FOLDER[6]="repository"
-FOLDER[7]="question/format"
-FOLDER[8]="portfolio"
-FOLDER[9]="lib/editor/atto/plugins"
-FOLDER[10]="anmeldung"
-FOLDER[11]="blocks"
-FOLDER[12]="mod/assign/submission"
-FOLDER[13]="question/type"
-FOLDER[14]="grade/report"
-FOLDER[15]="course/format"
-FOLDER[16]="availability"
-FOLDER[17]="question/behaviour"
+# check and create plugin list
+if test ! -e $SCRIPT_PATH/plugins.conf
+then
+        cp $SCRIPT_PATH/plugins.conf.dist $SCRIPT_PATH/plugins.conf
+fi
 
-# settings
+# load plugin list
+source $SCRIPT_PATH/plugins.conf
+
+        # check if file got loaded
+        printf "%-25s %s" "load plugins" ": "
+
+                if test "$PLUGINS_LOADED" = "TRUE"
+                then
+                        printf "${LIGHTGREEN}%s${NC}\n" "OK"
+                else
+                        printf "${LIGHTRED}%s${NC}\n" "FAILED" 1>&2
+                        exit 1
+                fi
+
+
+# check and create settings file
+if test ! -e $SCRIPT_PATH/settings.conf
+then
+        cp $SCRIPT_PATH/settings.conf.dist $SCRIPT_PATH/settings.conf
+fi
+
+# load settings
+source $SCRIPT_PATH/settings.conf
+
+        # check if file got loaded
+        printf "%-25s %s" "load settings" ": "
+
+                if test "$SETTINGS_LOADED" = "TRUE"
+                then
+                        printf "${LIGHTGREEN}%s${NC}\n" "OK"
+                else
+                        printf "${LIGHTRED}%s${NC}\n" "FAILED" 1>&2
+                        exit 2
+                fi
+
+
+# set settings
 CONTINUE="null"
-WEBUSER="www-data"
-WEB_PATH="/var/www"
-PHP_PATH="/usr/bin/php"
-CURL_PATH="/usr/bin/curl"
 MOODLE_LINK_NAME="moodle"
 MOODLE_PATH="$WEB_PATH/$MOODLE_LINK_NAME"
 MOODLE_CONFIG="$MOODLE_PATH/config.php"
@@ -115,7 +137,7 @@ printf "%-25s %s" "moodle config" ": "
         if test ! -e $MOODLE_CONFIG
         then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
-                exit 1
+                exit 3
         else
                 printf "${LIGHTGREEN}%s${NC}\n" "OK"
 
@@ -135,7 +157,7 @@ printf "%-25s %s" "moodle data folder" ": "
         if test ! -d $MOODLE_DATA_PATH
         then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
-                exit 1
+                exit 4
         else
                 printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
@@ -208,7 +230,7 @@ printf "%-25s %s" "file size (MB)" ": "
         if test $FILESIZE -eq 0
         then
                 printf "${LIGHTRED}%s${NC} \n" " FAILED" 1>&2
-                exit 65
+                exit 5
         else
                 printf "\n"
         fi
@@ -220,7 +242,7 @@ printf "%-25s %s" "web path (folder)" ": "
         if test ! -d $WEB_PATH
         then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
-                exit 1
+                exit 6
         else
                 printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
@@ -232,7 +254,7 @@ printf "%-25s %s" "web path (access)" ": "
         if test ! -e $WEB_PATH
         then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
-                exit 2
+                exit 7
         else
                 printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
@@ -244,7 +266,7 @@ printf "%-25s %s" "php" ": "
         if test ! -e $PHP_PATH
         then
                 printf "%s \n" "FAILED"  1>&2
-                exit 3
+                exit 8
         else
                 printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
@@ -256,7 +278,7 @@ printf "%-25s %s" "cURL" ": "
         if test ! -e $CURL_PATH
         then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
-                exit 5
+                exit 9
         else
                 printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
@@ -268,7 +290,7 @@ printf "%-25s %s" "moodle path" ": "
         if test ! -d $MOODLE_PATH_REAL
         then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
-                exit 4
+                exit 10
         else
                 printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
@@ -297,7 +319,7 @@ printf "%s \n" "all pre-checks successfull"
                         printf "\n"
                         printf "%s \n" "goodbye."
                         printf "\n"
-                        exit 1
+                        exit 11
                 fi
 
 # user wants to continue
@@ -389,7 +411,7 @@ printf "%-25s %s" "copy: config.php" ": "
                 checkstatus
         else
                 printf "${LIGHTRED}%s${NC} \n" "file missing" 1>&2
-                exit 11
+                exit 12
         fi
 
 
@@ -479,7 +501,7 @@ printf "%-25s \n" "update moodle ..."
         then
                 printf "\n"
                 printf "%-25s %s ${LIGHTRED}%s${NC}\n" "upgrade moodle" ":" " FAILED" 1>&2
-                exit 12
+                exit 13
         else
                 printf "\n"
                 printf "%-25s %s ${LIGHTGREEN}%s${NC}\n" "upgrade moodle" ":" "OK"
