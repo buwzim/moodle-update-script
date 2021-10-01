@@ -16,5 +16,8 @@ To automate __our environment__ we wrote this shell script. It may won't work in
 1. Create a symlink from there to `/var/www/moodle-update`
 1. Make it executable: `chmod +x moodle-update`
 
-### Plugins
-At the top of the script you have to check the list of folders which shall be used in the new moodle version. It's the `FOLDER[]`-Array. Modify it to your needs.
+### Configs
+If you don't create your own `.conf` files, the script will create it for you and use __our__ settings and plugins:
+
+1. Copy plugins file: `cp plugins.conf.dist plugins.conf`
+1. Copy settings file: `cp settings.conf.dist settings.conf`
