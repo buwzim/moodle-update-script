@@ -11,6 +11,12 @@ To automate __our environment__ we wrote this shell script. It may won't work in
 * New version + explicit file: `./update-moodle 3.5 https://example.com/moodle-3.5.2.zip`
 
 
+## Missing plugin sources
+If Moodle is missing some plugin folders, run this command (adapted to your language) to find missing folders:
+
+`diff -qr moodle_3.10 moodle_3.10_2021-10-01_09-49-12 | grep "Nur in moodle_3.10_"`
+
+
 ## Setup
 1. Clone the repository.
 1. Create a symlink from there to `/var/www/moodle-update`
