@@ -4,7 +4,7 @@ To automate __our environment__ we wrote this bash script. It may won't work in 
 
 ## Setup
 1. Clone this repository.
-1. Make the script executable: `chmod +x moodle-update`
+1. Make the script executable (if not cloned): `chmod +x moodle-update`
 
 
 ### Config
