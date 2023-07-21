@@ -197,6 +197,9 @@ then
 else
         MOODLE_DOWNLOAD_FILE="moodle-latest-${MOODLE_VERSION_NEXT_URL}.zip"
         MOODLE_DOWNLOAD_URL="https://download.moodle.org/download.php/direct/stable${MOODLE_VERSION_NEXT_URL}/$MOODLE_DOWNLOAD_FILE"
+
+        # example v3.9: https://download.moodle.org/download.php/direct/stable39/moodle-latest-39.zip
+        # example v4.1: https://download.moodle.org/download.php/direct/stable401/moodle-latest-401.zip
 fi
 
 
