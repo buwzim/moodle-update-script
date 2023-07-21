@@ -1,18 +1,37 @@
 #!/bin/bash
 
-#=======================================================#
-#   Bergische Universität Wuppertal                     #
-#                                                       #
-#   Author:                                             #
-#      Sebastian Sennewald                              #
-#                                                       #
-#   Source:                                             #
-#      https://github.com/buwzim/moodle-update-script   #
-#                                                       #
-#   License:                                            #
-#      GPLv3, see LICENSE file                          #
-#                                                       #
-#=======================================================#
+#======================================================#
+#  THIS VERSION                                        #
+#======================================================#
+#   Leuphana Universität Lüneburg                      #
+#                                                      #
+#   Author:                                            #
+#      Sebastian Sennewald                             #
+#                                                      #
+#   Sources:                                           #
+#      https://github.com/mizcm/moodle-update-script   #
+#                                                      #
+#   License:                                           #
+#      GPLv3, see LICENSE file                         #
+#                                                      #
+#======================================================#
+
+
+#======================================================#
+#  FORKED FROM                                         #
+#======================================================#
+#   Bergische Universität Wuppertal                    #
+#                                                      #
+#   Author:                                            #
+#      Sebastian Sennewald                             #
+#                                                      #
+#   Sources:                                           #
+#      https://github.com/buwzim/moodle-update-script  #
+#                                                      #
+#   License:                                           #
+#      GPLv3, see LICENSE file                         #
+#                                                      #
+#======================================================#
 
 
 # No Colour
@@ -63,9 +82,9 @@ tput clear
 
 printf "\n"
 printf "\n"
-printf "${WHITE}%s${NC}\n" "+------------------------------+"
-printf "${WHITE}%s${NC}\n" "+     moodle update script     +"
-printf "${WHITE}%s${NC}\n" "+------------------------------+"
+printf "${WHITE}%s${NC}\n" "+------------------------------------+"
+printf "${WHITE}%s${NC}\n" "+        moodle update script        +"
+printf "${WHITE}%s${NC}\n" "+------------------------------------+"
 printf "\n"
 
 # get script path
@@ -82,38 +101,30 @@ else
 fi
 
 
-# check and create plugin list
-if test ! -e $SCRIPT_PATH/plugins.conf
-then
-        cp $SCRIPT_PATH/plugins.conf.dist $SCRIPT_PATH/plugins.conf
-fi
-
-# load plugin list
-source $SCRIPT_PATH/plugins.conf
-
-        # check if file got loaded
-        printf "%-25s %s" "load plugins" ": "
-
-                if test "$PLUGINS_LOADED" = "TRUE"
-                then
-                        printf "${LIGHTGREEN}%s${NC}\n" "OK"
-                else
-                        printf "${LIGHTRED}%s${NC}\n" "FAILED" 1>&2
-                        exit 1
-                fi
-
-
 # check and create settings file
 if test ! -e $SCRIPT_PATH/settings.conf
 then
-        cp $SCRIPT_PATH/settings.conf.dist $SCRIPT_PATH/settings.conf
+        # create default settings if file doesn't exists
+        printf "%-30s %s" "create settings file" ": "
+
+                echo '# Do not delete this line' > $SCRIPT_PATH/settings.conf
+                echo 'SETTINGS_LOADED="TRUE"' >> $SCRIPT_PATH/settings.conf
+                echo ' ' >> $SCRIPT_PATH/settings.conf
+                echo '# Adapt this list to your settings' >> $SCRIPT_PATH/settings.conf
+                echo 'WEBUSER="www-data"' >> $SCRIPT_PATH/settings.conf
+                echo 'WEB_PATH="/var/www"' >> $SCRIPT_PATH/settings.conf
+                echo 'PHP_PATH="/usr/bin/php"' >> $SCRIPT_PATH/settings.conf
+                echo 'CURL_PATH="/usr/bin/curl"' >> $SCRIPT_PATH/settings.conf
+                echo 'UNZIP_PATH="/usr/bin/unzip"' >> $SCRIPT_PATH/settings.conf
+
+        checkstatus
 fi
 
 # load settings
 source $SCRIPT_PATH/settings.conf
 
         # check if file got loaded
-        printf "%-25s %s" "load settings" ": "
+        printf "%-30s %s" "load settings" ": "
 
                 if test "$SETTINGS_LOADED" = "TRUE"
                 then
@@ -132,7 +143,7 @@ MOODLE_CONFIG="$MOODLE_PATH/config.php"
 
 
 # check moodle config file
-printf "%-25s %s" "moodle config" ": "
+printf "%-30s %s" "moodle config" ": "
 
         if test ! -e $MOODLE_CONFIG
         then
@@ -152,7 +163,7 @@ TEMP2=${TEMP1//\'}
 MOODLE_DATA_PATH=${TEMP2//\;}
 
 # check moodle data path
-printf "%-25s %s" "moodle data folder" ": "
+printf "%-30s %s" "moodle data folder" ": "
 
         if test ! -d $MOODLE_DATA_PATH
         then
@@ -186,11 +197,13 @@ then
 else
         MOODLE_DOWNLOAD_FILE="moodle-latest-${MOODLE_VERSION_NEXT_URL}.zip"
         MOODLE_DOWNLOAD_URL="https://download.moodle.org/download.php/direct/stable${MOODLE_VERSION_NEXT_URL}/$MOODLE_DOWNLOAD_FILE"
+
+        # example v3.9: https://download.moodle.org/download.php/direct/stable39/moodle-latest-39.zip
+        # example v4.1: https://download.moodle.org/download.php/direct/stable401/moodle-latest-401.zip
 fi
 
 
-MOODLE_TEMP="moodle_temp"
-MOODLE_TEMP_PATH="$WEB_PATH/$MOODLE_TEMP"
+MOODLE_TEMP_PATH="$WEB_PATH/moodle_temp"
 
 MOODLE_NEXT="moodle_$MOODLE_VERSION_NEXT"
 MOODLE_NEXT_PATH="$WEB_PATH/$MOODLE_NEXT"
@@ -203,26 +216,38 @@ BACKUP_PATH="$WEB_PATH/$BACKUP_NAME"
 
 # ask if versions are corret
 printf "\n"
-printf "%-25s ${LIGHTCYAN}%s${NC} \n" "target version" ": $MOODLE_VERSION_NEXT"
-printf "%-25s ${LIGHTCYAN}%s${NC} \n" "current version" ": $MOODLE_VERSION_NOW"
+printf "%-30s ${LIGHTCYAN}%s${NC} \n" "target version" ": $MOODLE_VERSION_NEXT"
+printf "%-30s ${LIGHTCYAN}%s${NC} \n" "current version" ": $MOODLE_VERSION_NOW"
 printf "\n"
 
 
 # show download url
-printf "%-25s %s ${LIGHTPURPLE}%s${NC} \n" "download url" ":" "$MOODLE_DOWNLOAD_URL"
+printf "%-30s %s ${LIGHTPURPLE}%s${NC} \n" "download url" ":" "$MOODLE_DOWNLOAD_URL"
+
+
+# check web path: folder
+printf "%-30s %s" "web path (folder)" ": "
+
+        if test ! -d $WEB_PATH
+        then
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
+                exit 6
+        else
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
+        fi
 
 
 # download latest moodle
-printf "%-25s %s" "download moodle" ": "
+printf "%-30s %s" "download moodle" ": "
 
-        wget -q $MOODLE_DOWNLOAD_URL
+        wget -q "$MOODLE_DOWNLOAD_URL" --directory-prefix="$WEB_PATH/"
         checkstatus
 
 
 # file size
-printf "%-25s %s" "file size (MB)" ": "
+printf "%-30s %s" "file size (MB)" ": "
 
-        FILESIZE=$(cat $MOODLE_DOWNLOAD_FILE | wc -c)
+        FILESIZE=$(cat $WEB_PATH/$MOODLE_DOWNLOAD_FILE | wc -c)
         FILESIZE=$(( FILESIZE / 1024 / 1024 ))
 
         printf "${LIGHTCYAN}%d${NC}" "$FILESIZE"
@@ -236,20 +261,8 @@ printf "%-25s %s" "file size (MB)" ": "
         fi
 
 
-# check web path: folder
-printf "%-25s %s" "web path (folder)" ": "
-
-        if test ! -d $WEB_PATH
-        then
-                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
-                exit 6
-        else
-                printf "${LIGHTGREEN}%s${NC}\n" "OK"
-        fi
-
-
 # check web path: access
-printf "%-25s %s" "web path (access)" ": "
+printf "%-30s %s" "web path (access)" ": "
 
         if test ! -e $WEB_PATH
         then
@@ -261,7 +274,7 @@ printf "%-25s %s" "web path (access)" ": "
 
 
 # check php
-printf "%-25s %s" "php" ": "
+printf "%-30s %s" "php" ": "
 
         if test ! -e $PHP_PATH
         then
@@ -272,8 +285,8 @@ printf "%-25s %s" "php" ": "
         fi
 
 
-# check if cURL is available
-printf "%-25s %s" "cURL" ": "
+# check cURL
+printf "%-30s %s" "cURL" ": "
 
         if test ! -e $CURL_PATH
         then
@@ -284,8 +297,20 @@ printf "%-25s %s" "cURL" ": "
         fi
 
 
+# check unzip
+printf "%-30s %s" "unzip" ": "
+
+        if test ! -e $UNZIP_PATH
+        then
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
+                exit 14
+        else
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
+        fi
+
+
 # check current moodle path
-printf "%-25s %s" "moodle path" ": "
+printf "%-30s %s" "moodle path" ": "
 
         if test ! -d $MOODLE_PATH_REAL
         then
@@ -297,7 +322,7 @@ printf "%-25s %s" "moodle path" ": "
 
 
 # go to web folder
-printf "%-25s %s" "go to web folder" ": "
+printf "%-30s %s" "go to web folder" ": "
 
         cd $WEB_PATH
         checkstatus
@@ -310,15 +335,19 @@ printf "%s \n" "all pre-checks successfull"
         # ask user to continue
         until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
         do
-                printf "${ORANGE}%-25s${NC} %s" "continue? (y/n)" ": "
+                printf "${ORANGE}%-30s${NC} %s" "continue? (y/n)" ": "
                 read -n 1 CONTINUE
         done
 
                 if test "$CONTINUE" = "n"
                 then
-                        printf "\n"
-                        printf "%s \n" "goodbye."
-                        printf "\n"
+                        # delete downloaded zip file
+                        printf "\n%-30s %s" "delete downloaded file" ": "
+
+                                rm $WEB_PATH/$MOODLE_DOWNLOAD_FILE
+                                checkstatus
+
+                        printf "\n${LIGHTGREEN}%s${NC} \n\n" "goodbye."
                         exit 11
                 fi
 
@@ -327,26 +356,26 @@ printf "\n"
 
 
 # moodle -> maintenance mode -> enable
-printf "%-25s %s" "enable maintenance" ": "
+printf "%-30s %s" "enable maintenance" ": "
 
         $PHP_PATH $MOODLE_PATH_REAL/admin/cli/maintenance.php --enableold > /dev/null
         checkstatus
 
 
 # time to wait in maintenance mode until work continues
-printf "${ORANGE}%-25s${NC} %s" "minutes to wait" ": "
+printf "${ORANGE}%-30s${NC} %s" "minutes to wait" ": "
 
         read -r WAIT_FOR_MAINTENANCE
 
                 until test $WAIT_FOR_MAINTENANCE -ge 0
                 do
                         printf "\n"
-                        printf "${ORANGE}%-25s${NC} %s" "minutes to wait" ": "
+                        printf "${ORANGE}%-30s${NC} %s" "minutes to wait" ": "
 
                         read -r WAIT_FOR_MAINTENANCE
                 done
 
-        printf "%-25s %s" "waiting ..." ": "
+        printf "%-30s %s" "waiting ..." ": "
         sleep ${WAIT_FOR_MAINTENANCE}m
 
         printf "${LIGHTGREEN}%s${NC}\n" "OK"
@@ -355,7 +384,7 @@ printf "${ORANGE}%-25s${NC} %s" "minutes to wait" ": "
 # stay in maintenance mode?
 until test "$STAY_IN_MAINTENANCE" = "y" -o "$STAY_IN_MAINTENANCE" = "n"
 do
-        printf "${ORANGE}%-25s${NC} %s" "stay in maintenance (y/n)" ": "
+        printf "${ORANGE}%-30s${NC} %s" "stay in maintenance (y/n)" ": "
         read -n 1 STAY_IN_MAINTENANCE
 done
 
@@ -363,47 +392,54 @@ printf "\n"
 
 
 # create backup
-printf "%-25s %s" "moodle backup" ": "
+printf "%-30s %s" "moodle backup" ": "
 
         cp -r $MOODLE_PATH_REAL/ $BACKUP_PATH/
         checkstatus
 
 
 # delete old moodle folder
-printf "%-25s %s" "delete old moodle" ": "
+printf "%-30s %s" "delete old moodle" ": "
 
         rm -r "$MOODLE_PATH_REAL"
         checkstatus
 
 
 # unzip
-printf "%-25s %s" "unzip to temp folder" ": "
+printf "%-30s %s" "unzip to temp folder" ": "
 
-        unzip -q $WEB_PATH/$MOODLE_DOWNLOAD_FILE -d $MOODLE_TEMP_PATH
-        checkstatus
+        #check if file exists
+        if test -e $WEB_PATH/$MOODLE_DOWNLOAD_FILE
+        then
+                unzip -q $WEB_PATH/$MOODLE_DOWNLOAD_FILE -d $MOODLE_TEMP_PATH
+                checkstatus
+        else
+                printf "%s \n" "FAILED: no file to unzip!"  1>&2
+                exit 13
+        fi
 
 
-printf "%-25s %s" "move to version folder" ": "
+printf "%-30s %s" "move to version folder" ": "
 
         mv $MOODLE_TEMP_PATH/moodle/ $MOODLE_NEXT_PATH/
         checkstatus
 
 
 # clean up
-printf "%-25s %s" "delete temp folder" ": "
+printf "%-30s %s" "delete temp folder" ": "
 
         rm -r $MOODLE_TEMP_PATH/
         checkstatus
 
 
-printf "%-25s %s" "delete downloaded file" ": "
+printf "%-30s %s" "delete downloaded file" ": "
 
         rm $MOODLE_DOWNLOAD_FILE
         checkstatus
 
 
 # copy config
-printf "%-25s %s" "copy: config.php" ": "
+printf "%-30s %s" "copy: config.php" ": "
 
         if test -e $BACKUP_PATH/config.php
         then
@@ -416,72 +452,74 @@ printf "%-25s %s" "copy: config.php" ": "
 
 
 # copy plugins
-printf "\n"
+printf "\n%-30s %s" "previous plugins" ": "
+
+        # create lists of all plugins
+        $(cd $BACKUP_PATH; find . -name 'version.php' > /tmp/moodle-update-diff-list_old.txt)
+        $(cd $MOODLE_NEXT_PATH; find . -name 'version.php' > /tmp/moodle-update-diff-list_new.txt)
+
+        # diff which plugins are only in the old moodle directory
+        PLUGIN_DIFF=$(diff /tmp/moodle-update-diff-list_old.txt /tmp/moodle-update-diff-list_new.txt | grep "<")
+
+        # clean up
+        PLUGIN_DIFF=${PLUGIN_DIFF//< .\//}
+        PLUGIN_DIFF=${PLUGIN_DIFF///version.php/}
+        echo $PLUGIN_DIFF > /tmp/moodle-update-diff-list_final.txt
+
+        # create array of missing plugins
+        PLUGIN_DIFF_ARRAY=($PLUGIN_DIFF)
+
+        # print array
+        printf "${LIGHTCYAN}%d${NC}\n" "${#PLUGIN_DIFF_ARRAY[*]}"
 
         # choose copy mode
         until test "$COPYALL" = "y" -o "$COPYALL" = "n"
         do
-                printf "${ORANGE}%-25s${NC}" "copy ALL plugins? (y/n): "
+                printf "${ORANGE}%-30s${NC} %s" "copy ALL plugins? (y/n)" ": "
                 read -n 1 COPYALL
+                echo " "
         done
 
-
-printf "\n"
-printf "%s \n" "begin to copy plugins ..."
-
-# make a list of all plugin categories
-for PLUGINDIR in ${FOLDER[@]}
-do
-        # make a list of all sub-folders of current plugin category
-        for PLUGIN in $(ls $BACKUP_PATH/$PLUGINDIR/)
+        # iterate through missing plugins
+        for PLUGIN_PATH in ${PLUGIN_DIFF_ARRAY[@]}
         do
-                # check if current list item is MISSING inside the new mooddle folder
-                if test ! -d $MOODLE_NEXT_PATH/$PLUGINDIR/$PLUGIN
+                # pre-define user input if copy mode is set to ALL
+                if test "$COPYALL" = "y"
                 then
-                        # if current list item is a folder
-                        if test -d $BACKUP_PATH/$PLUGINDIR/$PLUGIN
-                        then
-
-                                # pre-define user input if copy mode is set to ALL
-                                if test "$COPYALL" = "y"
-                                then
-                                        CONTINUE="y"
-                                fi
-
-                                # copy folder if wanted
-                                until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
-                                do
-                                        printf "%-46s %s" "Copy $PLUGINDIR/$PLUGIN? (y/n)" ": "
-                                        read -n 1 -s CONTINUE
-                                done
-
-                                # copy yes
-                                if test "$CONTINUE" = "y"
-                                then
-                                        # create parent folder if missing
-                                        if test ! -d $MOODLE_NEXT_PATH/$PLUGINDIR
-                                        then
-                                                mkdir $MOODLE_NEXT_PATH/$PLUGINDIR
-                                        fi
-
-                                        cp -r $BACKUP_PATH/$PLUGINDIR/$PLUGIN/ $MOODLE_NEXT_PATH/$PLUGINDIR/$PLUGIN/
-
-                                                if test "$COPYALL" = "y"
-                                                then
-                                                        printf "%-46s %s" "Copy $PLUGINDIR/$PLUGIN" ": "
-                                                fi
-
-                                        checkstatus
-                                else
-                                        printf "%s \n" "SKIPPED"
-                                fi
-
-                                # set to default
-                                CONTINUE="null"
-                        fi
+                        CONTINUE="y"
                 fi
+
+                # copy folder if wanted
+                until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
+                do
+                        printf "%-66s %s" "Copy $PLUGIN_PATH? (y/n)" ": "
+                        read -n 1 -s CONTINUE
+                done
+
+                # copy yes
+                if test "$CONTINUE" = "y"
+                then
+                        # create parent folder if missing
+                        if test ! -d $MOODLE_NEXT_PATH/$PLUGIN_PATH
+                        then
+                                mkdir -p $MOODLE_NEXT_PATH/$PLUGIN_PATH
+                        fi
+
+                        cp -r $BACKUP_PATH/$PLUGIN_PATH/ $MOODLE_NEXT_PATH/${PLUGIN_PATH%/*}
+
+                        if test "$COPYALL" = "y"
+                        then
+                                printf "%-46s %s" "Copy $PLUGIN_PATH" ": "
+                        fi
+
+                        checkstatus
+                else
+                        printf "%s \n" "SKIPPED"
+                fi
+
+                # set to default
+                CONTINUE="null"
         done
-done
 
 
 # update sym link
@@ -493,23 +531,23 @@ printf "%-46s %s" "update symlink" ": "
 
 
 # update moodle
-printf "%-25s \n" "update moodle ..."
+printf "%-30s \n" "update moodle ..."
 
         $PHP_PATH $MOODLE_PATH/admin/cli/upgrade.php --non-interactive
 
         if test $? -ne 0
         then
                 printf "\n"
-                printf "%-25s %s ${LIGHTRED}%s${NC}\n" "upgrade moodle" ":" " FAILED" 1>&2
+                printf "%-30s %s ${LIGHTRED}%s${NC}\n" "upgrade moodle" ":" " FAILED" 1>&2
                 exit 13
         else
                 printf "\n"
-                printf "%-25s %s ${LIGHTGREEN}%s${NC}\n" "upgrade moodle" ":" "OK"
+                printf "%-30s %s ${LIGHTGREEN}%s${NC}\n" "upgrade moodle" ":" "OK"
         fi
 
 
 # modify license lang strings
-printf "%-25s %s" "language strings (en)" ": "
+printf "%-30s %s" "language strings (en)" ": "
 
         grep 'ungeprueft' $LANG_LICENSE_EN > /dev/null
 
@@ -526,7 +564,7 @@ printf "%-25s %s" "language strings (en)" ": "
         fi
 
 
-printf "%-25s %s" "language strings (de)" ": "
+printf "%-30s %s" "custom language strings (de)" ": "
 
         grep 'ungeprueft' $LANG_LICENSE_DE > /dev/null
 
@@ -543,8 +581,15 @@ printf "%-25s %s" "language strings (de)" ": "
         fi
 
 
+# php exec
+printf "%-30s %s" "make cli scripts executable" ": "
+
+        chmod +x $MOODLE_PATH/admin/cli/*.php
+        checkstatus
+
+
 # set rights
-printf "%-25s %s" "update permissions" ": "
+printf "%-30s %s" "update permissions" ": "
 
         chown -R "$WEBUSER:$WEBUSER" $MOODLE_NEXT_PATH && chown -R "$WEBUSER:$WEBUSER" $MOODLE_PATH
         checkstatus
@@ -553,23 +598,20 @@ printf "%-25s %s" "update permissions" ": "
 # moodle -> maintenance mode -> disable
 if test "$STAY_IN_MAINTENANCE" = "n"
 then
-        printf "%-25s %s" "disable maintenance" ": "
+        printf "%-30s %s" "disable maintenance" ": "
 
         $PHP_PATH $MOODLE_PATH/admin/cli/maintenance.php --disable > /dev/null
         checkstatus
 else
-        printf "%-25s %s ${LIGHTGREEN}%s${NC}\n" "stay in maintenance" ":" "OK"
+        printf "%-30s %s ${LIGHTGREEN}%s${NC}\n" "stay in maintenance" ":" "OK"
 fi
 
 
 # delete cache
-printf "%-25s %s" "purge cache" ": "
+printf "%-30s %s" "purge cache" ": "
 
         $PHP_PATH $MOODLE_PATH/admin/cli/purge_caches.php
         checkstatus
 
-
-printf "\n"
-printf "\n"
-printf "${LIGHTGREEN}%s${NC}\n" "All jobs done."
-printf "\n"
+# the end
+printf "\n\n${LIGHTGREEN}%s${NC}\n\n" "All jobs done."
