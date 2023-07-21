@@ -581,6 +581,13 @@ printf "%-30s %s" "custom language strings (de)" ": "
         fi
 
 
+# php exec
+printf "%-30s %s" "make cli scripts executable" ": "
+
+        chmod +x $MOODLE_PATH/admin/cli/*.php
+        checkstatus
+
+
 # set rights
 printf "%-30s %s" "update permissions" ": "
 
