@@ -82,9 +82,9 @@ tput clear
 
 printf "\n"
 printf "\n"
-printf "${WHITE}%s${NC}\n" "+------------------------------+"
-printf "${WHITE}%s${NC}\n" "+     moodle update script     +"
-printf "${WHITE}%s${NC}\n" "+------------------------------+"
+printf "${WHITE}%s${NC}\n" "+------------------------------------+"
+printf "${WHITE}%s${NC}\n" "+        moodle update script        +"
+printf "${WHITE}%s${NC}\n" "+------------------------------------+"
 printf "\n"
 
 # get script path
@@ -448,8 +448,7 @@ printf "%-30s %s" "copy: config.php" ": "
 
 
 # copy plugins
-printf "\n"
-printf "%s \n" "list missing plugins:"
+printf "\n%-30s %s" "previous plugins" ": "
 
         # create lists of all plugins
         $(cd $BACKUP_PATH; find . -name 'version.php' > /tmp/moodle-update-diff-list_old.txt)
@@ -467,13 +466,12 @@ printf "%s \n" "list missing plugins:"
         PLUGIN_DIFF_ARRAY=($PLUGIN_DIFF)
 
         # print array
-        echo ${#array[*]}
-        printf "\n"
+        printf "${LIGHTCYAN}%d${NC}\n" "${#PLUGIN_DIFF_ARRAY[*]}"
 
         # choose copy mode
         until test "$COPYALL" = "y" -o "$COPYALL" = "n"
         do
-                printf "${ORANGE}%-30s${NC}" "copy ALL plugins? (y/n): "
+                printf "${ORANGE}%-30s${NC} %s" "copy ALL plugins? (y/n)" ": "
                 read -n 1 COPYALL
                 echo " "
         done
@@ -604,8 +602,5 @@ printf "%-30s %s" "purge cache" ": "
         $PHP_PATH $MOODLE_PATH/admin/cli/purge_caches.php
         checkstatus
 
-
-printf "\n"
-printf "\n"
-printf "${LIGHTGREEN}%s${NC}\n" "All jobs done."
-printf "\n"
+# the end
+printf "\n\n${LIGHTGREEN}%s${NC}\n\n" "All jobs done."
