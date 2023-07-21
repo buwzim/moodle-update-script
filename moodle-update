@@ -1,18 +1,37 @@
 #!/bin/bash
 
-#=======================================================#
-#   Bergische Universität Wuppertal                     #
-#                                                       #
-#   Author:                                             #
-#      Sebastian Sennewald                              #
-#                                                       #
-#   Source:                                             #
-#      https://github.com/buwzim/moodle-update-script   #
-#                                                       #
-#   License:                                            #
-#      GPLv3, see LICENSE file                          #
-#                                                       #
-#=======================================================#
+#======================================================#
+#  THIS VERSION                                        #
+#======================================================#
+#   Leuphana Universität Lüneburg                      #
+#                                                      #
+#   Author:                                            #
+#      Sebastian Sennewald                             #
+#                                                      #
+#   Sources:                                           #
+#      https://github.com/mizcm/moodle-update-script   #
+#                                                      #
+#   License:                                           #
+#      GPLv3, see LICENSE file                         #
+#                                                      #
+#======================================================#
+
+
+#======================================================#
+#  FORKED FROM                                         #
+#======================================================#
+#   Bergische Universität Wuppertal                    #
+#                                                      #
+#   Author:                                            #
+#      Sebastian Sennewald                             #
+#                                                      #
+#   Sources:                                           #
+#      https://github.com/buwzim/moodle-update-script  #
+#                                                      #
+#   License:                                           #
+#      GPLv3, see LICENSE file                         #
+#                                                      #
+#======================================================#
 
 
 # No Colour
