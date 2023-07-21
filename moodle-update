@@ -104,7 +104,20 @@ fi
 # check and create settings file
 if test ! -e $SCRIPT_PATH/settings.conf
 then
-        cp $SCRIPT_PATH/settings.conf.dist $SCRIPT_PATH/settings.conf
+        # create default settings if file doesn't exists
+        printf "%-25s %s" "create settings file" ": "
+
+                echo '# Do not delete this line' > $SCRIPT_PATH/settings.conf
+                echo 'SETTINGS_LOADED="TRUE"' >> $SCRIPT_PATH/settings.conf
+                echo ' ' >> $SCRIPT_PATH/settings.conf
+                echo '# Adapt this list to your settings' >> $SCRIPT_PATH/settings.conf
+                echo 'WEBUSER="www-data"' >> $SCRIPT_PATH/settings.conf
+                echo 'WEB_PATH="/var/www"' >> $SCRIPT_PATH/settings.conf
+                echo 'PHP_PATH="/usr/bin/php"' >> $SCRIPT_PATH/settings.conf
+                echo 'CURL_PATH="/usr/bin/curl"' >> $SCRIPT_PATH/settings.conf
+                echo 'UNZIP_PATH="/usr/bin/unzip"' >> $SCRIPT_PATH/settings.conf
+
+        checkstatus
 fi
 
 # load settings

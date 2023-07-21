@@ -1,8 +1,0 @@
-# Do not delete this line
-SETTINGS_LOADED="TRUE"
-
-# Adapt this list to your settings
-WEBUSER="www-data"
-WEB_PATH="/var/www"
-PHP_PATH="/usr/bin/php"
-CURL_PATH="/usr/bin/curl"
