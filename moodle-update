@@ -101,27 +101,6 @@ else
 fi
 
 
-# check and create plugin list
-if test ! -e $SCRIPT_PATH/plugins.conf
-then
-        cp $SCRIPT_PATH/plugins.conf.dist $SCRIPT_PATH/plugins.conf
-fi
-
-# load plugin list
-source $SCRIPT_PATH/plugins.conf
-
-        # check if file got loaded
-        printf "%-25s %s" "load plugins" ": "
-
-                if test "$PLUGINS_LOADED" = "TRUE"
-                then
-                        printf "${LIGHTGREEN}%s${NC}\n" "OK"
-                else
-                        printf "${LIGHTRED}%s${NC}\n" "FAILED" 1>&2
-                        exit 1
-                fi
-
-
 # check and create settings file
 if test ! -e $SCRIPT_PATH/settings.conf
 then
@@ -436,71 +415,75 @@ printf "%-25s %s" "copy: config.php" ": "
 
 # copy plugins
 printf "\n"
+printf "%s \n" "list missing plugins:"
+
+        # create lists of all plugins
+        $(cd $BACKUP_PATH; find . -name 'version.php' > /tmp/moodle-update-diff-list_old.txt)
+        $(cd $MOODLE_NEXT_PATH; find . -name 'version.php' > /tmp/moodle-update-diff-list_new.txt)
+
+        # diff which plugins are only in the old moodle directory
+        PLUGIN_DIFF=$(diff /tmp/moodle-update-diff-list_old.txt /tmp/moodle-update-diff-list_new.txt | grep "<")
+
+        # clean up
+        PLUGIN_DIFF=${PLUGIN_DIFF//< .\//}
+        PLUGIN_DIFF=${PLUGIN_DIFF///version.php/}
+        echo $PLUGIN_DIFF > /tmp/moodle-update-diff-list_final.txt
+
+        # create array of missing plugins
+        PLUGIN_DIFF_ARRAY=($PLUGIN_DIFF)
+
+        # print array
+        echo ${#array[*]}
+        printf "\n"
 
         # choose copy mode
         until test "$COPYALL" = "y" -o "$COPYALL" = "n"
         do
-                printf "${ORANGE}%-25s${NC}" "copy ALL plugins? (y/n): "
+                printf "${ORANGE}%-30s${NC}" "copy ALL plugins? (y/n): "
                 read -n 1 COPYALL
+                echo " "
         done
 
-
-printf "\n"
-printf "%s \n" "begin to copy plugins ..."
-
-# make a list of all plugin categories
-for PLUGINDIR in ${FOLDER[@]}
-do
-        # make a list of all sub-folders of current plugin category
-        for PLUGIN in $(ls $BACKUP_PATH/$PLUGINDIR/)
+        # iterate through missing plugins
+        for PLUGIN_PATH in ${PLUGIN_DIFF_ARRAY[@]}
         do
-                # check if current list item is MISSING inside the new mooddle folder
-                if test ! -d $MOODLE_NEXT_PATH/$PLUGINDIR/$PLUGIN
+                # pre-define user input if copy mode is set to ALL
+                if test "$COPYALL" = "y"
                 then
-                        # if current list item is a folder
-                        if test -d $BACKUP_PATH/$PLUGINDIR/$PLUGIN
-                        then
-
-                                # pre-define user input if copy mode is set to ALL
-                                if test "$COPYALL" = "y"
-                                then
-                                        CONTINUE="y"
-                                fi
-
-                                # copy folder if wanted
-                                until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
-                                do
-                                        printf "%-46s %s" "Copy $PLUGINDIR/$PLUGIN? (y/n)" ": "
-                                        read -n 1 -s CONTINUE
-                                done
-
-                                # copy yes
-                                if test "$CONTINUE" = "y"
-                                then
-                                        # create parent folder if missing
-                                        if test ! -d $MOODLE_NEXT_PATH/$PLUGINDIR
-                                        then
-                                                mkdir $MOODLE_NEXT_PATH/$PLUGINDIR
-                                        fi
-
-                                        cp -r $BACKUP_PATH/$PLUGINDIR/$PLUGIN/ $MOODLE_NEXT_PATH/$PLUGINDIR/$PLUGIN/
-
-                                                if test "$COPYALL" = "y"
-                                                then
-                                                        printf "%-46s %s" "Copy $PLUGINDIR/$PLUGIN" ": "
-                                                fi
-
-                                        checkstatus
-                                else
-                                        printf "%s \n" "SKIPPED"
-                                fi
-
-                                # set to default
-                                CONTINUE="null"
-                        fi
+                        CONTINUE="y"
                 fi
+
+                # copy folder if wanted
+                until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
+                do
+                        printf "%-66s %s" "Copy $PLUGIN_PATH? (y/n)" ": "
+                        read -n 1 -s CONTINUE
+                done
+
+                # copy yes
+                if test "$CONTINUE" = "y"
+                then
+                        # create parent folder if missing
+                        if test ! -d $MOODLE_NEXT_PATH/$PLUGIN_PATH
+                        then
+                                mkdir -p $MOODLE_NEXT_PATH/$PLUGIN_PATH
+                        fi
+
+                        cp -r $BACKUP_PATH/$PLUGIN_PATH/ $MOODLE_NEXT_PATH/${PLUGIN_PATH%/*}
+
+                        if test "$COPYALL" = "y"
+                        then
+                                printf "%-46s %s" "Copy $PLUGIN_PATH" ": "
+                        fi
+
+                        checkstatus
+                else
+                        printf "%s \n" "SKIPPED"
+                fi
+
+                # set to default
+                CONTINUE="null"
         done
-done
 
 
 # update sym link
