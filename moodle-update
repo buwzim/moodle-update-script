@@ -105,7 +105,7 @@ fi
 if test ! -e $SCRIPT_PATH/settings.conf
 then
         # create default settings if file doesn't exists
-        printf "%-25s %s" "create settings file" ": "
+        printf "%-30s %s" "create settings file" ": "
 
                 echo '# Do not delete this line' > $SCRIPT_PATH/settings.conf
                 echo 'SETTINGS_LOADED="TRUE"' >> $SCRIPT_PATH/settings.conf
@@ -124,7 +124,7 @@ fi
 source $SCRIPT_PATH/settings.conf
 
         # check if file got loaded
-        printf "%-25s %s" "load settings" ": "
+        printf "%-30s %s" "load settings" ": "
 
                 if test "$SETTINGS_LOADED" = "TRUE"
                 then
@@ -143,7 +143,7 @@ MOODLE_CONFIG="$MOODLE_PATH/config.php"
 
 
 # check moodle config file
-printf "%-25s %s" "moodle config" ": "
+printf "%-30s %s" "moodle config" ": "
 
         if test ! -e $MOODLE_CONFIG
         then
@@ -163,7 +163,7 @@ TEMP2=${TEMP1//\'}
 MOODLE_DATA_PATH=${TEMP2//\;}
 
 # check moodle data path
-printf "%-25s %s" "moodle data folder" ": "
+printf "%-30s %s" "moodle data folder" ": "
 
         if test ! -d $MOODLE_DATA_PATH
         then
@@ -216,17 +216,17 @@ BACKUP_PATH="$WEB_PATH/$BACKUP_NAME"
 
 # ask if versions are corret
 printf "\n"
-printf "%-25s ${LIGHTCYAN}%s${NC} \n" "target version" ": $MOODLE_VERSION_NEXT"
-printf "%-25s ${LIGHTCYAN}%s${NC} \n" "current version" ": $MOODLE_VERSION_NOW"
+printf "%-30s ${LIGHTCYAN}%s${NC} \n" "target version" ": $MOODLE_VERSION_NEXT"
+printf "%-30s ${LIGHTCYAN}%s${NC} \n" "current version" ": $MOODLE_VERSION_NOW"
 printf "\n"
 
 
 # show download url
-printf "%-25s %s ${LIGHTPURPLE}%s${NC} \n" "download url" ":" "$MOODLE_DOWNLOAD_URL"
+printf "%-30s %s ${LIGHTPURPLE}%s${NC} \n" "download url" ":" "$MOODLE_DOWNLOAD_URL"
 
 
 # check web path: folder
-printf "%-25s %s" "web path (folder)" ": "
+printf "%-30s %s" "web path (folder)" ": "
 
         if test ! -d $WEB_PATH
         then
@@ -238,14 +238,14 @@ printf "%-25s %s" "web path (folder)" ": "
 
 
 # download latest moodle
-printf "%-25s %s" "download moodle" ": "
+printf "%-30s %s" "download moodle" ": "
 
         wget -q $MOODLE_DOWNLOAD_URL
         checkstatus
 
 
 # file size
-printf "%-25s %s" "file size (MB)" ": "
+printf "%-30s %s" "file size (MB)" ": "
 
         FILESIZE=$(cat $MOODLE_DOWNLOAD_FILE | wc -c)
         FILESIZE=$(( FILESIZE / 1024 / 1024 ))
@@ -262,7 +262,7 @@ printf "%-25s %s" "file size (MB)" ": "
 
 
 # check web path: access
-printf "%-25s %s" "web path (access)" ": "
+printf "%-30s %s" "web path (access)" ": "
 
         if test ! -e $WEB_PATH
         then
@@ -274,7 +274,7 @@ printf "%-25s %s" "web path (access)" ": "
 
 
 # check php
-printf "%-25s %s" "php" ": "
+printf "%-30s %s" "php" ": "
 
         if test ! -e $PHP_PATH
         then
@@ -285,8 +285,8 @@ printf "%-25s %s" "php" ": "
         fi
 
 
-# check if cURL is available
-printf "%-25s %s" "cURL" ": "
+# check cURL
+printf "%-30s %s" "cURL" ": "
 
         if test ! -e $CURL_PATH
         then
@@ -310,7 +310,7 @@ printf "%-30s %s" "unzip" ": "
 
 
 # check current moodle path
-printf "%-25s %s" "moodle path" ": "
+printf "%-30s %s" "moodle path" ": "
 
         if test ! -d $MOODLE_PATH_REAL
         then
@@ -322,7 +322,7 @@ printf "%-25s %s" "moodle path" ": "
 
 
 # go to web folder
-printf "%-25s %s" "go to web folder" ": "
+printf "%-30s %s" "go to web folder" ": "
 
         cd $WEB_PATH
         checkstatus
@@ -335,7 +335,7 @@ printf "%s \n" "all pre-checks successfull"
         # ask user to continue
         until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
         do
-                printf "${ORANGE}%-25s${NC} %s" "continue? (y/n)" ": "
+                printf "${ORANGE}%-30s${NC} %s" "continue? (y/n)" ": "
                 read -n 1 CONTINUE
         done
 
@@ -352,26 +352,26 @@ printf "\n"
 
 
 # moodle -> maintenance mode -> enable
-printf "%-25s %s" "enable maintenance" ": "
+printf "%-30s %s" "enable maintenance" ": "
 
         $PHP_PATH $MOODLE_PATH_REAL/admin/cli/maintenance.php --enableold > /dev/null
         checkstatus
 
 
 # time to wait in maintenance mode until work continues
-printf "${ORANGE}%-25s${NC} %s" "minutes to wait" ": "
+printf "${ORANGE}%-30s${NC} %s" "minutes to wait" ": "
 
         read -r WAIT_FOR_MAINTENANCE
 
                 until test $WAIT_FOR_MAINTENANCE -ge 0
                 do
                         printf "\n"
-                        printf "${ORANGE}%-25s${NC} %s" "minutes to wait" ": "
+                        printf "${ORANGE}%-30s${NC} %s" "minutes to wait" ": "
 
                         read -r WAIT_FOR_MAINTENANCE
                 done
 
-        printf "%-25s %s" "waiting ..." ": "
+        printf "%-30s %s" "waiting ..." ": "
         sleep ${WAIT_FOR_MAINTENANCE}m
 
         printf "${LIGHTGREEN}%s${NC}\n" "OK"
@@ -380,7 +380,7 @@ printf "${ORANGE}%-25s${NC} %s" "minutes to wait" ": "
 # stay in maintenance mode?
 until test "$STAY_IN_MAINTENANCE" = "y" -o "$STAY_IN_MAINTENANCE" = "n"
 do
-        printf "${ORANGE}%-25s${NC} %s" "stay in maintenance (y/n)" ": "
+        printf "${ORANGE}%-30s${NC} %s" "stay in maintenance (y/n)" ": "
         read -n 1 STAY_IN_MAINTENANCE
 done
 
@@ -388,14 +388,14 @@ printf "\n"
 
 
 # create backup
-printf "%-25s %s" "moodle backup" ": "
+printf "%-30s %s" "moodle backup" ": "
 
         cp -r $MOODLE_PATH_REAL/ $BACKUP_PATH/
         checkstatus
 
 
 # delete old moodle folder
-printf "%-25s %s" "delete old moodle" ": "
+printf "%-30s %s" "delete old moodle" ": "
 
         rm -r "$MOODLE_PATH_REAL"
         checkstatus
@@ -415,27 +415,27 @@ printf "%-30s %s" "unzip to temp folder" ": "
         fi
 
 
-printf "%-25s %s" "move to version folder" ": "
+printf "%-30s %s" "move to version folder" ": "
 
         mv $MOODLE_TEMP_PATH/moodle/ $MOODLE_NEXT_PATH/
         checkstatus
 
 
 # clean up
-printf "%-25s %s" "delete temp folder" ": "
+printf "%-30s %s" "delete temp folder" ": "
 
         rm -r $MOODLE_TEMP_PATH/
         checkstatus
 
 
-printf "%-25s %s" "delete downloaded file" ": "
+printf "%-30s %s" "delete downloaded file" ": "
 
         rm $MOODLE_DOWNLOAD_FILE
         checkstatus
 
 
 # copy config
-printf "%-25s %s" "copy: config.php" ": "
+printf "%-30s %s" "copy: config.php" ": "
 
         if test -e $BACKUP_PATH/config.php
         then
@@ -529,23 +529,23 @@ printf "%-46s %s" "update symlink" ": "
 
 
 # update moodle
-printf "%-25s \n" "update moodle ..."
+printf "%-30s \n" "update moodle ..."
 
         $PHP_PATH $MOODLE_PATH/admin/cli/upgrade.php --non-interactive
 
         if test $? -ne 0
         then
                 printf "\n"
-                printf "%-25s %s ${LIGHTRED}%s${NC}\n" "upgrade moodle" ":" " FAILED" 1>&2
+                printf "%-30s %s ${LIGHTRED}%s${NC}\n" "upgrade moodle" ":" " FAILED" 1>&2
                 exit 13
         else
                 printf "\n"
-                printf "%-25s %s ${LIGHTGREEN}%s${NC}\n" "upgrade moodle" ":" "OK"
+                printf "%-30s %s ${LIGHTGREEN}%s${NC}\n" "upgrade moodle" ":" "OK"
         fi
 
 
 # modify license lang strings
-printf "%-25s %s" "language strings (en)" ": "
+printf "%-30s %s" "language strings (en)" ": "
 
         grep 'ungeprueft' $LANG_LICENSE_EN > /dev/null
 
@@ -562,7 +562,7 @@ printf "%-25s %s" "language strings (en)" ": "
         fi
 
 
-printf "%-25s %s" "custom language strings (de)" ": "
+printf "%-30s %s" "custom language strings (de)" ": "
 
         grep 'ungeprueft' $LANG_LICENSE_DE > /dev/null
 
@@ -580,7 +580,7 @@ printf "%-25s %s" "custom language strings (de)" ": "
 
 
 # set rights
-printf "%-25s %s" "update permissions" ": "
+printf "%-30s %s" "update permissions" ": "
 
         chown -R "$WEBUSER:$WEBUSER" $MOODLE_NEXT_PATH && chown -R "$WEBUSER:$WEBUSER" $MOODLE_PATH
         checkstatus
@@ -589,17 +589,17 @@ printf "%-25s %s" "update permissions" ": "
 # moodle -> maintenance mode -> disable
 if test "$STAY_IN_MAINTENANCE" = "n"
 then
-        printf "%-25s %s" "disable maintenance" ": "
+        printf "%-30s %s" "disable maintenance" ": "
 
         $PHP_PATH $MOODLE_PATH/admin/cli/maintenance.php --disable > /dev/null
         checkstatus
 else
-        printf "%-25s %s ${LIGHTGREEN}%s${NC}\n" "stay in maintenance" ":" "OK"
+        printf "%-30s %s ${LIGHTGREEN}%s${NC}\n" "stay in maintenance" ":" "OK"
 fi
 
 
 # delete cache
-printf "%-25s %s" "purge cache" ": "
+printf "%-30s %s" "purge cache" ": "
 
         $PHP_PATH $MOODLE_PATH/admin/cli/purge_caches.php
         checkstatus
