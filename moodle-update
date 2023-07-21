@@ -341,9 +341,13 @@ printf "%s \n" "all pre-checks successfull"
 
                 if test "$CONTINUE" = "n"
                 then
-                        printf "\n"
-                        printf "%s \n" "goodbye."
-                        printf "\n"
+                        # delete downloaded zip file
+                        printf "\n%-30s %s" "delete downloaded file" ": "
+
+                                rm $WEB_PATH/$MOODLE_DOWNLOAD_FILE
+                                checkstatus
+
+                        printf "\n${LIGHTGREEN}%s${NC} \n\n" "goodbye."
                         exit 11
                 fi
 
