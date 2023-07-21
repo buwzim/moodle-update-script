@@ -240,14 +240,14 @@ printf "%-30s %s" "web path (folder)" ": "
 # download latest moodle
 printf "%-30s %s" "download moodle" ": "
 
-        wget -q $MOODLE_DOWNLOAD_URL
+        wget -q "$MOODLE_DOWNLOAD_URL" --directory-prefix="$WEB_PATH/"
         checkstatus
 
 
 # file size
 printf "%-30s %s" "file size (MB)" ": "
 
-        FILESIZE=$(cat $MOODLE_DOWNLOAD_FILE | wc -c)
+        FILESIZE=$(cat $WEB_PATH/$MOODLE_DOWNLOAD_FILE | wc -c)
         FILESIZE=$(( FILESIZE / 1024 / 1024 ))
 
         printf "${LIGHTCYAN}%d${NC}" "$FILESIZE"
