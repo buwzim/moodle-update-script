@@ -203,8 +203,7 @@ else
 fi
 
 
-MOODLE_TEMP="moodle_temp"
-MOODLE_TEMP_PATH="$WEB_PATH/$MOODLE_TEMP"
+MOODLE_TEMP_PATH="$WEB_PATH/moodle_temp"
 
 MOODLE_NEXT="moodle_$MOODLE_VERSION_NEXT"
 MOODLE_NEXT_PATH="$WEB_PATH/$MOODLE_NEXT"
@@ -224,6 +223,18 @@ printf "\n"
 
 # show download url
 printf "%-25s %s ${LIGHTPURPLE}%s${NC} \n" "download url" ":" "$MOODLE_DOWNLOAD_URL"
+
+
+# check web path: folder
+printf "%-25s %s" "web path (folder)" ": "
+
+        if test ! -d $WEB_PATH
+        then
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
+                exit 6
+        else
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
+        fi
 
 
 # download latest moodle
@@ -247,18 +258,6 @@ printf "%-25s %s" "file size (MB)" ": "
                 exit 5
         else
                 printf "\n"
-        fi
-
-
-# check web path: folder
-printf "%-25s %s" "web path (folder)" ": "
-
-        if test ! -d $WEB_PATH
-        then
-                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
-                exit 6
-        else
-                printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
 
 
@@ -544,7 +543,7 @@ printf "%-25s %s" "language strings (en)" ": "
         fi
 
 
-printf "%-25s %s" "language strings (de)" ": "
+printf "%-25s %s" "custom language strings (de)" ": "
 
         grep 'ungeprueft' $LANG_LICENSE_DE > /dev/null
 
