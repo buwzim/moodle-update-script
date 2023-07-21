@@ -297,6 +297,18 @@ printf "%-25s %s" "cURL" ": "
         fi
 
 
+# check unzip
+printf "%-30s %s" "unzip" ": "
+
+        if test ! -e $UNZIP_PATH
+        then
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
+                exit 14
+        else
+                printf "${LIGHTGREEN}%s${NC}\n" "OK"
+        fi
+
+
 # check current moodle path
 printf "%-25s %s" "moodle path" ": "
 
@@ -390,10 +402,17 @@ printf "%-25s %s" "delete old moodle" ": "
 
 
 # unzip
-printf "%-25s %s" "unzip to temp folder" ": "
+printf "%-30s %s" "unzip to temp folder" ": "
 
-        unzip -q $WEB_PATH/$MOODLE_DOWNLOAD_FILE -d $MOODLE_TEMP_PATH
-        checkstatus
+        #check if file exists
+        if test -e $WEB_PATH/$MOODLE_DOWNLOAD_FILE
+        then
+                unzip -q $WEB_PATH/$MOODLE_DOWNLOAD_FILE -d $MOODLE_TEMP_PATH
+                checkstatus
+        else
+                printf "%s \n" "FAILED: no file to unzip!"  1>&2
+                exit 13
+        fi
 
 
 printf "%-25s %s" "move to version folder" ": "
