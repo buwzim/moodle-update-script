@@ -14,9 +14,9 @@ The script creates a `settings.conf` file for a standard Debian/Ubuntu Linux.
 
 
 ## Usage options
-- Without any parameter: `./update-moodle`
-- With new version: `./update-moodle 3.9`
-- With new version + explicit download file: `./update-moodle 3.9 https://example.com/moodle-3.9.21.zip`
+- Without any parameter: `./moodle-update`
+- With new version: `./moodle-update 3.9`
+- With new version + explicit download file: `./moodle-update 3.9 https://example.com/moodle-3.9.21.zip`
 
 
 ### Important information for Moodle 4
