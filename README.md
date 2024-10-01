@@ -5,6 +5,10 @@ To automate __our environment__ we wrote this bash script. It may won't work in 
 ## Setup
 1. Clone this repository.
 1. Make the script executable (if not cloned): `chmod +x moodle-update`
+1. Go to your web directory: `cd /var/www`
+1. Rename the moodle directory to: `moodle_x.y` like `moodle_4.01`
+1. Create a link to this directory with the absolute path: `ln -s /var/www/moodle_4.01 moodle`
+1. Tell your web server to serve `/var/www/moodle`.
 
 
 ### Config
