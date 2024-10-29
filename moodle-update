@@ -472,6 +472,20 @@ printf "\n%-30s %s" "previous plugins" ": "
         # print array
         printf "${LIGHTCYAN}%d${NC}\n" "${#PLUGIN_DIFF_ARRAY[*]}"
 
+        # format_topcoll detection
+        if test -d "$BACKUP_PATH/course/format/topcoll/"
+        then
+                echo " "
+                printf "${LIGHTRED}%-30s${NC}\n" "format_topcoll detected"
+                printf "${ORANGE}%-30s${NC} %s" "enter download url" ": "
+                read -r PLUGIN_FORMAT_TOPCOLL_URL
+
+                printf "%-30s %s" "format_topcoll download" ": "
+                wget --quiet $PLUGIN_FORMAT_TOPCOLL_URL -O /tmp/format_topcoll.zip
+                checkstatus
+                echo " "
+        fi
+
         # choose copy mode
         until test "$COPYALL" = "y" -o "$COPYALL" = "n"
         do
@@ -506,6 +520,15 @@ printf "\n%-30s %s" "previous plugins" ": "
                         fi
 
                         cp -r $BACKUP_PATH/$PLUGIN_PATH/ $MOODLE_NEXT_PATH/${PLUGIN_PATH%/*}
+
+
+                        # copy format_topcoll
+                        if test "$PLUGIN_PATH" = "course/format/topcoll"
+                        then
+                                rm -r $MOODLE_NEXT_PATH/course/format/topcoll
+                                unzip -q /tmp/format_topcoll.zip -d $MOODLE_NEXT_PATH/course/format/topcoll
+                        fi
+
 
                         if test "$COPYALL" = "y"
                         then
