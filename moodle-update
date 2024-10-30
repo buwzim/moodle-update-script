@@ -477,6 +477,28 @@ printf "\n%-30s %s" "previous plugins" ": "
         then
                 echo " "
                 printf "${LIGHTRED}%-30s${NC}\n" "format_topcoll detected"
+
+                # suggest urls from: https://moodle.org/plugins/format_topcoll/versions
+                if test $MOODLE_VERSION_NEXT = "4.00"
+                then
+                        printf "%-30s %s\n" "suggested url" ": https://moodle.org/plugins/download.php/29774/format_topcoll_moodle40_2022041703.zip"
+                elif test $MOODLE_VERSION_NEXT = "4.01"
+                then
+                        printf "%-30s %s\n" "suggested url" ": https://moodle.org/plugins/download.php/29775/format_topcoll_moodle41_2022112602.zip"
+                elif test $MOODLE_VERSION_NEXT = "4.02"
+                then
+                        printf "%-30s %s\n" "suggested url" ": https://moodle.org/plugins/download.php/29776/format_topcoll_moodle42_2023042401.zip"
+                elif test $MOODLE_VERSION_NEXT = "4.03"
+                then
+                        printf "%-30s %s\n" "suggested url" ": https://moodle.org/plugins/download.php/31376/format_topcoll_moodle43_2023100701.zip"
+                elif test $MOODLE_VERSION_NEXT = "4.04"
+                then
+                        printf "%-30s %s\n" "suggested url" ": https://moodle.org/plugins/download.php/33218/format_topcoll_moodle44_2024032804.zip"
+                elif test $MOODLE_VERSION_NEXT = "4.05"
+                then
+                        printf "%-30s %s\n" "suggested url" ": https://moodle.org/plugins/download.php/33614/format_topcoll_moodle45_2024092200.zip"
+                fi
+
                 printf "${ORANGE}%-30s${NC} %s" "enter download url" ": "
                 read -r PLUGIN_FORMAT_TOPCOLL_URL
 
