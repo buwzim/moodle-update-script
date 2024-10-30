@@ -526,7 +526,7 @@ printf "\n%-30s %s" "previous plugins" ": "
                         if test "$PLUGIN_PATH" = "course/format/topcoll"
                         then
                                 rm -r $MOODLE_NEXT_PATH/course/format/topcoll
-                                unzip -q /tmp/format_topcoll.zip -d $MOODLE_NEXT_PATH/course/format/topcoll
+                                unzip -q /tmp/format_topcoll.zip -d $MOODLE_NEXT_PATH/course/format/
                         fi
 
 
