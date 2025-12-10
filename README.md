@@ -6,8 +6,8 @@ To automate __our environment__ we wrote this bash script. It may won't work in 
 1. Clone this repository.
 1. Make the script executable (if not cloned): `chmod +x moodle-update`
 1. Go to your web directory: `cd /var/www`
-1. Rename the moodle directory to: `moodle_x.y` like `moodle_4.01`
-1. Create a link to this directory with the absolute path: `ln -s /var/www/moodle_4.01 moodle`
+1. Rename the moodle directory to: `moodle_x.y` like `moodle_4.05`
+1. Create a link to this directory with the absolute path: `ln -s /var/www/moodle_4.05 moodle`
 1. Tell your web server to serve `/var/www/moodle`.
 
 
@@ -19,11 +19,11 @@ The script creates a `settings.conf` file for a standard Debian/Ubuntu Linux.
 
 ## Usage options
 - Without any parameter: `./moodle-update`
-- With new version: `./moodle-update 3.9`
-- With new version + explicit download file: `./moodle-update 3.9 https://example.com/moodle-3.9.21.zip`
+- With target version: `./moodle-update 4.05`
+- With target version + explicit download file: `./moodle-update 4.05 https://example.com/moodle-x.y.z.zip`
 
 
-### Important information for Moodle 4
+### Important information for Moodle 4+
 For some reason the latest zip file name scheme has changed:
 
 - `4.1` is called `401` (instead of `41`)
