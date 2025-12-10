@@ -96,11 +96,39 @@ SCRIPT_PATH=$(dirname "$(realpath $0)")
 # check if version parameter is given
 if test -z $1
 then
-        printf "%s" "enter target version (\"x.y\"): "
+        printf "%s" "enter target version (\"x.y.z\"): "
         read -r MOODLE_VERSION_NEXT
 else
         MOODLE_VERSION_NEXT=$1
 fi
+
+
+# get version elements
+MOODLE_VERSION_X=$(echo "$MOODLE_VERSION_NEXT" | cut -d'.' -f1)
+MOODLE_VERSION_Y=$(echo "$MOODLE_VERSION_NEXT" | cut -d'.' -f2)
+MOODLE_VERSION_Z=$(echo "$MOODLE_VERSION_NEXT" | cut -d'.' -f3)
+
+
+# build version branch
+if [[ $MOODLE_VERSION_Y -lt 10 ]]; then
+    MOODLE_VERSION_NEXT_BRANCH="$MOODLE_VERSION_X"0"$MOODLE_VERSION_Y"
+else
+    MOODLE_VERSION_NEXT_BRANCH="$MOODLE_VERSION_X$MOODLE_VERSION_Y"
+fi
+
+
+# check if url parameter is given
+if test $2
+then
+        # just take the input
+        MOODLE_DOWNLOAD_URL=$2
+        MOODLE_DOWNLOAD_FILE=${MOODLE_DOWNLOAD_URL##*/}
+else
+        # build download url
+        MOODLE_DOWNLOAD_FILE="moodle-$MOODLE_VERSION_X.$MOODLE_VERSION_Y.$MOODLE_VERSION_Z.zip"
+        MOODLE_DOWNLOAD_URL="https://download.moodle.org/download.php/direct/stable$MOODLE_VERSION_NEXT_BRANCH/$MOODLE_DOWNLOAD_FILE"
+fi
+
 
 
 # check and create settings file
@@ -179,28 +207,13 @@ printf "%-30s %s" "moodle data folder" ": "
 LANG_LICENSE_EN="$MOODLE_PATH/lang/en/license.php"
 LANG_LICENSE_DE="$MOODLE_DATA_PATH/lang/de/license.php"
 
-# build url version parameter
-MOODLE_VERSION_NEXT_URL=${MOODLE_VERSION_NEXT//.}
 
-# get current moodle version
+# get current moodle version and real path
 if test -h $MOODLE_PATH
 then
-        LINK_CURRENT_TARGET=$(readlink "$MOODLE_PATH")
+        LINK_CURRENT_TARGET=$(readlink "$MOODLE_PATH")                  # /var/www/moodle_4.5.8
         MOODLE_PATH_REAL="$LINK_CURRENT_TARGET"
-        MOODLE_VERSION_NOW=${LINK_CURRENT_TARGET//$WEB_PATH\/moodle_}
-fi
-
-# check if url parameter is given
-if test $2
-then
-        MOODLE_DOWNLOAD_URL=$2
-        MOODLE_DOWNLOAD_FILE=${MOODLE_DOWNLOAD_URL##*/}
-else
-        MOODLE_DOWNLOAD_FILE="moodle-latest-${MOODLE_VERSION_NEXT_URL}.zip"
-        MOODLE_DOWNLOAD_URL="https://download.moodle.org/download.php/direct/stable${MOODLE_VERSION_NEXT_URL}/$MOODLE_DOWNLOAD_FILE"
-
-        # example v3.9: https://download.moodle.org/download.php/direct/stable39/moodle-latest-39.zip
-        # example v4.1: https://download.moodle.org/download.php/direct/stable401/moodle-latest-401.zip
+        MOODLE_VERSION_NOW=${LINK_CURRENT_TARGET//$WEB_PATH\/moodle_}   # 4.5.8
 fi
 
 
@@ -212,11 +225,18 @@ BACKUP_PATH="$WEB_PATH/moodle_${MOODLE_VERSION_NOW}_$BACKUP_DATE"
 
 
 
-# ask if versions are corret
+# ask if versions are correct and supported
 printf "\n"
-printf "%-30s ${LIGHTCYAN}%s${NC} \n" "target version" ": $MOODLE_VERSION_NEXT"
-printf "%-30s ${LIGHTCYAN}%s${NC} \n" "current version" ": $MOODLE_VERSION_NOW"
-printf "\n"
+printf "%-30s %s ${LIGHTCYAN}%s${NC} \n" "current version" ":" "$MOODLE_VERSION_NOW"
+printf "%-30s %s ${LIGHTCYAN}%s${NC} \n" "target version" ":" "$MOODLE_VERSION_NEXT"
+printf "%-30s %s" "supported version" ": "
+
+        if [[ $MOODLE_VERSION_X < 4 ]]; then
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
+                exit 1
+        else
+                printf "${LIGHTGREEN}%s${NC}\n\n" "OK"
+        fi
 
 
 # show download url
