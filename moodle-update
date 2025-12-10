@@ -33,7 +33,7 @@
 #                                                      #
 #======================================================#
 
-# next exit code: 16
+# next exit code: 17
 
 
 # No Colour
@@ -98,6 +98,12 @@ if [[ -z $1 ]]; then
 else
         MOODLE_VERSION_NEXT=$1
 fi
+
+        # exit if version parameter is invalid
+        if [[ ! "$MOODLE_VERSION_NEXT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo "Invalid version format. Expected x.y.z"
+                exit 16
+        fi
 
 
 # get version elements
