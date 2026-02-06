@@ -33,6 +33,8 @@
 #                                                      #
 #======================================================#
 
+# next exit code: 17
+
 
 # No Colour
 NC='\033[0m'
@@ -52,8 +54,7 @@ function checkstatus() {
         # set to default
         CONTINUE="null"
 
-        if test $? -ne 0
-        then
+        if [[ $? -ne 0 ]]; then
                 # ask user to continue
                 until test "$CONTINUE" = "y" -o "$CONTINUE" = "n"
                 do
@@ -61,8 +62,7 @@ function checkstatus() {
                         read -r CONTINUE
                 done
 
-                        if test "$CONTINUE" = "n"
-                        then
+                        if [[ "$CONTINUE" = "n" ]]; then
                                 printf "\n"
                                 printf "%s \n" "process cancelled"
                                 printf "\n"
@@ -92,18 +92,49 @@ SCRIPT_PATH=$(dirname "$(realpath $0)")
 
 
 # check if version parameter is given
-if test -z $1
-then
-        printf "%s" "enter target version (\"x.y\"): "
+if [[ -z $1 ]]; then
+        printf "%s" "enter target version (\"x.y.z\"): "
         read -r MOODLE_VERSION_NEXT
 else
         MOODLE_VERSION_NEXT=$1
 fi
 
+        # exit if version parameter is invalid
+        if [[ ! "$MOODLE_VERSION_NEXT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                echo "Invalid version format. Expected x.y.z"
+                exit 16
+        fi
+
+
+# get version elements
+MOODLE_VERSION_X=$(echo "$MOODLE_VERSION_NEXT" | cut -d'.' -f1)
+MOODLE_VERSION_Y=$(echo "$MOODLE_VERSION_NEXT" | cut -d'.' -f2)
+MOODLE_VERSION_Z=$(echo "$MOODLE_VERSION_NEXT" | cut -d'.' -f3)
+
+
+# build version branch
+if [[ $MOODLE_VERSION_Y -lt 10 ]]; then
+    MOODLE_VERSION_NEXT_BRANCH="$MOODLE_VERSION_X"0"$MOODLE_VERSION_Y"
+else
+    MOODLE_VERSION_NEXT_BRANCH="$MOODLE_VERSION_X$MOODLE_VERSION_Y"
+fi
+
+
+# check if url parameter is given
+if [[ $2 ]]; then
+        # just take the input
+        MOODLE_DOWNLOAD_URL=$2
+        MOODLE_DOWNLOAD_FILE=${MOODLE_DOWNLOAD_URL##*/}
+else
+        # build download url
+        MOODLE_DOWNLOAD_FILE="moodle-$MOODLE_VERSION_X.$MOODLE_VERSION_Y.$MOODLE_VERSION_Z.zip"
+        MOODLE_DOWNLOAD_URL="https://download.moodle.org/download.php/direct/stable$MOODLE_VERSION_NEXT_BRANCH/$MOODLE_DOWNLOAD_FILE"
+fi
+
+
 
 # check and create settings file
-if test ! -e $SCRIPT_PATH/settings.conf
-then
+if [[ ! -e $SCRIPT_PATH/settings.conf ]]; then
         # create default settings if file doesn't exists
         printf "%-30s %s" "create settings file" ": "
 
@@ -126,8 +157,7 @@ source $SCRIPT_PATH/settings.conf
         # check if file got loaded
         printf "%-30s %s" "load settings" ": "
 
-                if test "$SETTINGS_LOADED" = "TRUE"
-                then
+                if [[ "$SETTINGS_LOADED" = "TRUE" ]]; then
                         printf "${LIGHTGREEN}%s${NC}\n" "OK"
                 else
                         printf "${LIGHTRED}%s${NC}\n" "FAILED" 1>&2
@@ -137,16 +167,14 @@ source $SCRIPT_PATH/settings.conf
 
 # set settings
 CONTINUE="null"
-MOODLE_LINK_NAME="moodle"
-MOODLE_PATH="$WEB_PATH/$MOODLE_LINK_NAME"
+MOODLE_PATH="$WEB_PATH/moodle"
 MOODLE_CONFIG="$MOODLE_PATH/config.php"
 
 
 # check moodle config file
 printf "%-30s %s" "moodle config" ": "
 
-        if test ! -e $MOODLE_CONFIG
-        then
+        if [[ ! -e $MOODLE_CONFIG ]]; then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 3
         else
@@ -165,8 +193,7 @@ MOODLE_DATA_PATH=${TEMP2//\;}
 # check moodle data path
 printf "%-30s %s" "moodle data folder" ": "
 
-        if test ! -d $MOODLE_DATA_PATH
-        then
+        if [[ ! -d $MOODLE_DATA_PATH ]]; then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 4
         else
@@ -178,47 +205,35 @@ printf "%-30s %s" "moodle data folder" ": "
 LANG_LICENSE_EN="$MOODLE_PATH/lang/en/license.php"
 LANG_LICENSE_DE="$MOODLE_DATA_PATH/lang/de/license.php"
 
-# build url version parameter
-MOODLE_VERSION_NEXT_URL=${MOODLE_VERSION_NEXT//.}
 
-# get current moodle version
-if test -h $MOODLE_PATH
-then
-        LINK_CURRENT_TARGET=$(readlink "$MOODLE_PATH")
+# get current moodle version and real path
+if [[ -h $MOODLE_PATH ]]; then
+        LINK_CURRENT_TARGET=$(readlink "$MOODLE_PATH")                  # /var/www/moodle_4.5.8
         MOODLE_PATH_REAL="$LINK_CURRENT_TARGET"
-        MOODLE_VERSION_NOW=${LINK_CURRENT_TARGET//$WEB_PATH\/moodle_}
-fi
-
-# check if url parameter is given
-if test $2
-then
-        MOODLE_DOWNLOAD_URL=$2
-        MOODLE_DOWNLOAD_FILE=${MOODLE_DOWNLOAD_URL##*/}
-else
-        MOODLE_DOWNLOAD_FILE="moodle-latest-${MOODLE_VERSION_NEXT_URL}.zip"
-        MOODLE_DOWNLOAD_URL="https://download.moodle.org/download.php/direct/stable${MOODLE_VERSION_NEXT_URL}/$MOODLE_DOWNLOAD_FILE"
-
-        # example v3.9: https://download.moodle.org/download.php/direct/stable39/moodle-latest-39.zip
-        # example v4.1: https://download.moodle.org/download.php/direct/stable401/moodle-latest-401.zip
+        MOODLE_VERSION_NOW=${LINK_CURRENT_TARGET//$WEB_PATH\/moodle_}   # 4.5.8
 fi
 
 
 MOODLE_TEMP_PATH="$WEB_PATH/moodle_temp"
-
-MOODLE_NEXT="moodle_$MOODLE_VERSION_NEXT"
-MOODLE_NEXT_PATH="$WEB_PATH/$MOODLE_NEXT"
+MOODLE_NEXT_PATH="$WEB_PATH/moodle_$MOODLE_VERSION_NEXT"
 
 BACKUP_DATE=$(date '+%F_%H-%M-%S')
-BACKUP_NAME="moodle_${MOODLE_VERSION_NOW}_$BACKUP_DATE"
-BACKUP_PATH="$WEB_PATH/$BACKUP_NAME"
+BACKUP_PATH="$WEB_PATH/moodle_${MOODLE_VERSION_NOW}_$BACKUP_DATE"
 
 
 
-# ask if versions are corret
+# ask if versions are correct and supported
 printf "\n"
-printf "%-30s ${LIGHTCYAN}%s${NC} \n" "target version" ": $MOODLE_VERSION_NEXT"
-printf "%-30s ${LIGHTCYAN}%s${NC} \n" "current version" ": $MOODLE_VERSION_NOW"
-printf "\n"
+printf "%-30s %s ${LIGHTCYAN}%s${NC} \n" "current version" ":" "$MOODLE_VERSION_NOW"
+printf "%-30s %s ${LIGHTCYAN}%s${NC} \n" "target version" ":" "$MOODLE_VERSION_NEXT"
+printf "%-30s %s" "supported version" ": "
+
+        if [[ $MOODLE_VERSION_X < 4 ]]; then
+                printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
+                exit 1
+        else
+                printf "${LIGHTGREEN}%s${NC}\n\n" "OK"
+        fi
 
 
 # show download url
@@ -228,8 +243,7 @@ printf "%-30s %s ${LIGHTPURPLE}%s${NC} \n" "download url" ":" "$MOODLE_DOWNLOAD_
 # check web path: folder
 printf "%-30s %s" "web path (folder)" ": "
 
-        if test ! -d $WEB_PATH
-        then
+        if [[ ! -d $WEB_PATH ]]; then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 6
         else
@@ -252,8 +266,7 @@ printf "%-30s %s" "file size (MB)" ": "
 
         printf "${LIGHTCYAN}%d${NC}" "$FILESIZE"
 
-        if test $FILESIZE -eq 0
-        then
+        if [[ $FILESIZE -eq 0 ]]; then
                 printf "${LIGHTRED}%s${NC} \n" " FAILED" 1>&2
                 exit 5
         else
@@ -264,8 +277,7 @@ printf "%-30s %s" "file size (MB)" ": "
 # check web path: access
 printf "%-30s %s" "web path (access)" ": "
 
-        if test ! -e $WEB_PATH
-        then
+        if [[ ! -e $WEB_PATH ]]; then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 7
         else
@@ -276,8 +288,7 @@ printf "%-30s %s" "web path (access)" ": "
 # check php
 printf "%-30s %s" "php" ": "
 
-        if test ! -e $PHP_PATH
-        then
+        if [[ ! -e $PHP_PATH ]]; then
                 printf "%s \n" "FAILED"  1>&2
                 exit 8
         else
@@ -288,8 +299,7 @@ printf "%-30s %s" "php" ": "
 # check cURL
 printf "%-30s %s" "cURL" ": "
 
-        if test ! -e $CURL_PATH
-        then
+        if [[ ! -e $CURL_PATH ]]; then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 9
         else
@@ -300,10 +310,9 @@ printf "%-30s %s" "cURL" ": "
 # check unzip
 printf "%-30s %s" "unzip" ": "
 
-        if test ! -e $UNZIP_PATH
-        then
+        if [[ ! -e $UNZIP_PATH ]]; then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
-                exit 14
+                exit 15
         else
                 printf "${LIGHTGREEN}%s${NC}\n" "OK"
         fi
@@ -312,8 +321,7 @@ printf "%-30s %s" "unzip" ": "
 # check current moodle path
 printf "%-30s %s" "moodle path" ": "
 
-        if test ! -d $MOODLE_PATH_REAL
-        then
+        if [[ ! -d $MOODLE_PATH_REAL ]]; then
                 printf "${LIGHTRED}%s${NC} \n" "FAILED" 1>&2
                 exit 10
         else
@@ -339,8 +347,7 @@ printf "%s \n" "all pre-checks successfull"
                 read -n 1 CONTINUE
         done
 
-                if test "$CONTINUE" = "n"
-                then
+                if [[ "$CONTINUE" = "n" ]]; then
                         # delete downloaded zip file
                         printf "\n%-30s %s" "delete downloaded file" ": "
 
@@ -409,8 +416,7 @@ printf "%-30s %s" "delete old moodle" ": "
 printf "%-30s %s" "unzip to temp folder" ": "
 
         #check if file exists
-        if test -e $WEB_PATH/$MOODLE_DOWNLOAD_FILE
-        then
+        if [[ -e $WEB_PATH/$MOODLE_DOWNLOAD_FILE ]]; then
                 unzip -q $WEB_PATH/$MOODLE_DOWNLOAD_FILE -d $MOODLE_TEMP_PATH
                 checkstatus
         else
@@ -441,8 +447,7 @@ printf "%-30s %s" "delete downloaded file" ": "
 # copy config
 printf "%-30s %s" "copy: config.php" ": "
 
-        if test -e $BACKUP_PATH/config.php
-        then
+        if [[ -e $BACKUP_PATH/config.php ]]; then
                 cp $BACKUP_PATH/config.php $MOODLE_NEXT_PATH/config.php
                 checkstatus
         else
@@ -484,8 +489,7 @@ printf "\n%-30s %s" "previous plugins" ": "
         for PLUGIN_PATH in ${PLUGIN_DIFF_ARRAY[@]}
         do
                 # pre-define user input if copy mode is set to ALL
-                if test "$COPYALL" = "y"
-                then
+                if [[ "$COPYALL" = "y" ]]; then
                         CONTINUE="y"
                 fi
 
@@ -497,18 +501,15 @@ printf "\n%-30s %s" "previous plugins" ": "
                 done
 
                 # copy yes
-                if test "$CONTINUE" = "y"
-                then
+                if [[ "$CONTINUE" = "y" ]]; then
                         # create parent folder if missing
-                        if test ! -d $MOODLE_NEXT_PATH/$PLUGIN_PATH
-                        then
+                        if [[ ! -d $MOODLE_NEXT_PATH/$PLUGIN_PATH ]]; then
                                 mkdir -p $MOODLE_NEXT_PATH/$PLUGIN_PATH
                         fi
 
                         cp -r $BACKUP_PATH/$PLUGIN_PATH/ $MOODLE_NEXT_PATH/${PLUGIN_PATH%/*}
 
-                        if test "$COPYALL" = "y"
-                        then
+                        if [[ "$COPYALL" = "y" ]]; then
                                 printf "%-46s %s" "Copy $PLUGIN_PATH" ": "
                         fi
 
@@ -535,11 +536,10 @@ printf "%-30s \n" "update moodle ..."
 
         $PHP_PATH $MOODLE_PATH/admin/cli/upgrade.php --non-interactive
 
-        if test $? -ne 0
-        then
+        if [[ $? -ne 0 ]]; then
                 printf "\n"
                 printf "%-30s %s ${LIGHTRED}%s${NC}\n" "upgrade moodle" ":" " FAILED" 1>&2
-                exit 13
+                exit 14
         else
                 printf "\n"
                 printf "%-30s %s ${LIGHTGREEN}%s${NC}\n" "upgrade moodle" ":" "OK"
@@ -551,8 +551,7 @@ printf "%-30s %s" "language strings (en)" ": "
 
         grep 'ungeprueft' $LANG_LICENSE_EN > /dev/null
 
-        if test $? -eq 1
-        then
+        if [[ $? -eq 1 ]]; then
                 echo "\$string['freielizenz'] = 'Freie Lizenz';" >> $LANG_LICENSE_EN
                 echo "\$string['52a'] = 'VG Wort';" >> $LANG_LICENSE_EN
                 echo "\$string['gemeinfrei'] = 'Gemeinfrei';" >> $LANG_LICENSE_EN
@@ -568,8 +567,7 @@ printf "%-30s %s" "custom language strings (de)" ": "
 
         grep 'ungeprueft' $LANG_LICENSE_DE > /dev/null
 
-        if test $? -eq 1
-        then
+        if [[ $? -eq 1 ]]; then
                 echo "\$string['freielizenz'] = 'Freie Lizenz';" >> $LANG_LICENSE_DE
                 echo "\$string['52a'] = 'VG Wort';" >> $LANG_LICENSE_DE
                 echo "\$string['gemeinfrei'] = 'Gemeinfrei';" >> $LANG_LICENSE_DE
@@ -596,8 +594,7 @@ printf "%-30s %s" "update permissions" ": "
 
 
 # moodle -> maintenance mode -> disable
-if test "$STAY_IN_MAINTENANCE" = "n"
-then
+if [[ "$STAY_IN_MAINTENANCE" = "n" ]]; then
         printf "%-30s %s" "disable maintenance" ": "
 
         $PHP_PATH $MOODLE_PATH/admin/cli/maintenance.php --disable > /dev/null
